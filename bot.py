@@ -20,7 +20,7 @@ API_ID = 35140329
 API_HASH = "011f638e4acadee178c59afffc80193d"
 BOT_TOKEN = "8603632286:AAE8Hw5xWzKjrpr4r7PrrMifZxu7-v93TaM"
 OWNER_ID = 7614459746
-OWNER_USERNAME = "BESTCHEAT_OWNER"  # 🔴 Bina @ ke daalo
+OWNER_USERNAME = "BESTCHEAT_OWNER"
 
 # ========== DATABASE ==========
 VIDEO_DB = "videos.json"
@@ -590,7 +590,6 @@ async def add_group_from_group(client, message: Message):
         chat_id = message.chat.id
         chat_name = message.chat.title or f"Group {chat_id}"
         
-        # Check if already added
         groups = load_groups()
         if str(chat_id) in groups:
             await message.reply_text(
@@ -1042,7 +1041,7 @@ async def stats_command(client, message):
 if __name__ == "__main__":
     print("\n" + "="*40)
     print("🚀 PREMIUM BOT STARTING...")
-    print("🔥 PHOENIX THEME ACTIVE")
+    print("🐉 DRAGON THEME ACTIVE")
     print("="*40 + "\n")
     
     if not os.path.exists(VIDEO_DB):
@@ -1059,7 +1058,7 @@ if __name__ == "__main__":
     print(f"👥 Groups: {len(get_all_groups())}")
     print("\n" + "="*40)
     print("🤖 BOT IS RUNNING!")
-    print("🔥 HAR BAAR NAYI VIDEO!")
+    print("🐉 HAR BAAR NAYI VIDEO!")
     print("="*40 + "\n")
     
     try:
