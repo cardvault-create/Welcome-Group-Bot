@@ -14,15 +14,16 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# ========== CONFIGURATION ==========
-API_ID = int(os.getenv("API_ID", 35140329))
-API_HASH = os.getenv("API_HASH", "011f638e4acadee178c59afffc80193d")
-MAIN_BOT_TOKEN = os.getenv("MAIN_BOT_TOKEN", "8603632286:AAE8Hw5xWzKjrpr4r7PrrMifZxu7-v93TaM")
-VIDEO_BOT_TOKEN = os.getenv("VIDEO_BOT_TOKEN", "8988202401:AAFagkU0KwAPiEesXrE9ND3rVRdlJmf4guo")
+# ========== 🔴 YAHAN APNA DATA DAALO ==========
+API_ID = 35140329  # 🔴 my.telegram.org se
+API_HASH = "011f638e4acadee178c59afffc80193d"  # 🔴 my.telegram.org se
+MAIN_BOT_TOKEN = "8603632286:AAE8Hw5xWzKjrpr4r7PrrMifZxu7-v93TaM"  # 🔴 @BotFather se (Group bot)
+VIDEO_BOT_TOKEN = "8988202401:AAFagkU0KwAPiEesXrE9ND3rVRdlJmf4guo"  # 🔴 @BotFather se (Video storage bot)
 
+# ========== DATABASE ==========
 VIDEO_DB = "videos.json"
 
-# ========== VIDEO DATABASE ==========
+# ========== VIDEO FUNCTIONS ==========
 def load_videos():
     try:
         if os.path.exists(VIDEO_DB):
@@ -87,17 +88,7 @@ JOIN_MESSAGES = [
 💫━━━━━━━━━━━━━━━━━💫
 
 🌟 **ɴᴇᴡ ᴘʟᴀʏᴇʀ** ɪɴ ᴛʜᴇ ʜᴏᴜsᴇ! 🎮
-⚡️ **ᴡᴇ'ʀᴇ** sᴏ **ᴇxᴄɪᴛᴇᴅ** ᴛᴏ ʜᴀᴠᴇ ʏᴏᴜ! 💫""",
-
-    """🔥━━━━━━━━━━━━━━━━━🔥
-╔━━━━━━━━━━━━━━━━━╗
-║ ⭐️ **{user}** ⭐️
-║ 🎊 **WELCOME** aboard!
-╚━━━━━━━━━━━━━━━━━╝
-🔥━━━━━━━━━━━━━━━━━🔥
-
-🌈 **ɴᴇᴡ** ᴍᴇᴍʙᴇʀ **ᴜɴʟᴏᴄᴋᴇᴅ**! 🗝️
-💫 **ᴛʜᴇ** ғᴀᴍɪʟʏ **ɢʀᴏᴡs** ʙʏ ᴏɴᴇ! 🎉"""
+⚡️ **ᴡᴇ'ʀᴇ** sᴏ **ᴇxᴄɪᴛᴇᴅ** ᴛᴏ ʜᴀᴠᴇ ʏᴏᴜ! 💫"""
 ]
 
 LEFT_MESSAGES = [
@@ -109,17 +100,7 @@ LEFT_MESSAGES = [
 😔━━━━━━━━━━━━━━━━━😔
 
 🕊️ **ᴡᴇ'ʟʟ** ᴍɪss ʏᴏᴜ **ᴅᴇᴀʀ** ғʀɪᴇɴᴅ! 💫
-🌈 **ɢᴏᴏᴅʙʏᴇ** ᴀɴᴅ **ᴛᴀᴋᴇ** ᴄᴀʀᴇ! 🌟""",
-
-    """🌧️━━━━━━━━━━━━━━━━━🌧️
-╔━━━━━━━━━━━━━━━━━╗
-║ 👋 **{user}** 👋
-║ 🚪 **EXITED** the group!
-╚━━━━━━━━━━━━━━━━━╝
-🌧️━━━━━━━━━━━━━━━━━🌧️
-
-😢 **sᴀᴅ** ᴛᴏ sᴇᴇ ʏᴏᴜ **ʟᴇᴀᴠᴇ**! 💔
-🌟 **ʏᴏᴜ'ʟʟ** ʙᴇ **ᴍɪssᴇᴅ** ʜᴇʀᴇ! 🥺"""
+🌈 **ɢᴏᴏᴅʙʏᴇ** ᴀɴᴅ **ᴛᴀᴋᴇ** ᴄᴀʀᴇ! 🌟"""
 ]
 
 BAN_MESSAGES = [
@@ -131,20 +112,10 @@ BAN_MESSAGES = [
 🚫━━━━━━━━━━━━━━━━━🚫
 
 ⚖️ **ʀᴜʟᴇs** ᴡᴇʀᴇ **ʙʀᴏᴋᴇɴ**! 🚨
-❌ **ᴀᴄᴛɪᴏɴ** ʜᴀs ʙᴇᴇɴ **ᴛᴀᴋᴇɴ**! 💥""",
-
-    """🔒━━━━━━━━━━━━━━━━━🔒
-╔━━━━━━━━━━━━━━━━━╗
-║ 🚷 **{user}** 🚷
-║ 🔐 **PERMANENTLY** banned!
-╚━━━━━━━━━━━━━━━━━╝
-🔒━━━━━━━━━━━━━━━━━🔒
-
-⛓️ **sᴇᴄᴜʀɪᴛʏ** ᴍᴇᴀsᴜʀᴇs **ᴀᴄᴛɪᴠᴀᴛᴇᴅ**! 🛡️
-🗑️ **ʀᴇᴍᴏᴠᴇᴅ** ғʀᴏᴍ ᴛʜᴇ **ᴄᴏᴍᴍᴜɴɪᴛʏ**! ❌"""
+❌ **ᴀᴄᴛɪᴏɴ** ʜᴀs ʙᴇᴇɴ **ᴛᴀᴋᴇɴ**! 💥"""
 ]
 
-# ========== BOTS ==========
+# ========== MAIN BOT ==========
 main_app = Client(
     "main_bot",
     api_id=API_ID,
@@ -152,6 +123,7 @@ main_app = Client(
     bot_token=MAIN_BOT_TOKEN
 )
 
+# ========== VIDEO BOT ==========
 video_app = Client(
     "video_bot",
     api_id=API_ID,
@@ -182,31 +154,37 @@ async def send_premium_notification(chat_id, user_mention, message_template):
             await main_app.send_message(chat_id=chat_id, text=msg_text)
             logger.info("📝 Message sent (no video)")
     except Exception as e:
-        logger.error(f"❌ Error: {e}")
+        logger.error(f"❌ Error in notification: {e}")
 
+# ---------- JOIN/LEFT/BAN HANDLER ----------
 @main_app.on_chat_member_updated()
 async def member_update_handler(client, update: ChatMemberUpdated):
-    chat_id = update.chat.id
-    
-    if update.new_chat_member and not update.old_chat_member:
-        user = update.new_chat_member.user
-        mention = f"[{user.first_name}](tg://user?id={user.id})"
-        await send_premium_notification(chat_id, mention, random.choice(JOIN_MESSAGES))
-        logger.info(f"👤 JOIN: {user.first_name}")
-    
-    elif update.old_chat_member and not update.new_chat_member:
-        user = update.old_chat_member.user
-        mention = f"[{user.first_name}](tg://user?id={user.id})"
-        await send_premium_notification(chat_id, mention, random.choice(LEFT_MESSAGES))
-        logger.info(f"🚶 LEFT: {user.first_name}")
-    
-    elif update.new_chat_member and update.new_chat_member.status in ["kicked", "restricted"]:
-        user = update.new_chat_member.user
-        mention = f"[{user.first_name}](tg://user?id={user.id})"
-        await send_premium_notification(chat_id, mention, random.choice(BAN_MESSAGES))
-        logger.info(f"🚫 BANNED: {user.first_name}")
+    try:
+        chat_id = update.chat.id
+        
+        if update.new_chat_member and not update.old_chat_member:
+            user = update.new_chat_member.user
+            mention = f"[{user.first_name}](tg://user?id={user.id})"
+            await send_premium_notification(chat_id, mention, random.choice(JOIN_MESSAGES))
+            logger.info(f"👤 JOIN: {user.first_name}")
+        
+        elif update.old_chat_member and not update.new_chat_member:
+            user = update.old_chat_member.user
+            mention = f"[{user.first_name}](tg://user?id={user.id})"
+            await send_premium_notification(chat_id, mention, random.choice(LEFT_MESSAGES))
+            logger.info(f"🚶 LEFT: {user.first_name}")
+        
+        elif update.new_chat_member and update.new_chat_member.status in ["kicked", "restricted"]:
+            user = update.new_chat_member.user
+            mention = f"[{user.first_name}](tg://user?id={user.id})"
+            await send_premium_notification(chat_id, mention, random.choice(BAN_MESSAGES))
+            logger.info(f"🚫 BANNED: {user.first_name}")
+    except Exception as e:
+        logger.error(f"❌ Error in member update: {e}")
 
 # ========== VIDEO BOT COMMANDS ==========
+
+# ---------- START COMMAND ----------
 @video_app.on_message(filters.command("start") & filters.private)
 async def video_start(client, message):
     await message.reply_text(
@@ -231,6 +209,7 @@ async def video_start(client, message):
 💎 **ᴘʀᴇᴍɪᴜᴍ** sᴛᴏʀᴀɢᴇ 💎"""
     )
 
+# ---------- SAVE VIDEO ----------
 @video_app.on_message(filters.command("save") & filters.private)
 async def save_video_command(client, message):
     status = await message.reply_text("⏳ **sᴀᴠɪɴɢ ᴠɪᴅᴇᴏ...**")
@@ -244,15 +223,16 @@ async def save_video_command(client, message):
                 f"📹 **ᴛᴏᴛᴀʟ ᴠɪᴅᴇᴏs:** {get_video_count()}"
             )
         else:
-            await status.edit_text("❌ **ᴘʟᴇᴀsᴇ ʀᴇᴘʟʏ ᴛᴏ ᴀ ᴠɪᴅᴇᴏ!**")
+            await status.edit_text("❌ **ᴘʟᴇᴀsᴇ ʀᴇᴘʟʏ ᴛᴏ ᴀ ᴠɪᴅᴇᴏ!**\n\nSend video and reply with `/save`")
     except Exception as e:
         await status.edit_text(f"❌ **ᴇʀʀᴏʀ:** {str(e)}")
 
+# ---------- VIEW VIDEOS ----------
 @video_app.on_message(filters.command("videos") & filters.private)
 async def list_videos(client, message):
     videos = load_videos()
     if not videos:
-        await message.reply_text("❌ **ɴᴏ ᴠɪᴅᴇᴏs ғᴏᴜɴᴅ!**")
+        await message.reply_text("❌ **ɴᴏ ᴠɪᴅᴇᴏs ғᴏᴜɴᴅ!**\n\nSend video and reply with `/save`")
         return
     
     text = f"🎬 **ᴛᴏᴛᴀʟ ᴠɪᴅᴇᴏs:** {len(videos)}\n\n"
@@ -269,6 +249,7 @@ async def list_videos(client, message):
     text += f"\n💡 **ᴜsᴀɢᴇ:** `/delete 1` ᴛᴏ ᴅᴇʟᴇᴛᴇ"
     await message.reply_text(text)
 
+# ---------- DELETE VIDEO ----------
 @video_app.on_message(filters.command("delete") & filters.private)
 async def delete_video(client, message):
     try:
@@ -297,6 +278,7 @@ async def delete_video(client, message):
     except:
         await message.reply_text("❌ **ɪɴᴠᴀʟɪᴅ ғᴏʀᴍᴀᴛ!**")
 
+# ---------- CLEAR ALL VIDEOS ----------
 @video_app.on_message(filters.command("clear") & filters.private)
 async def clear_videos(client, message):
     videos = load_videos()
@@ -316,6 +298,7 @@ async def clear_videos(client, message):
         f"📹 **ʀᴇᴍᴏᴠᴇᴅ:** {len(videos)} ᴠɪᴅᴇᴏs"
     )
 
+# ---------- STATISTICS ----------
 @video_app.on_message(filters.command("stats") & filters.private)
 async def stats_command(client, message):
     videos = load_videos()
@@ -350,26 +333,40 @@ async def keep_alive():
 async def main():
     logger.info("🚀 Starting Premium Bots...")
     
+    # Create database if not exists
     if not os.path.exists(VIDEO_DB):
         with open(VIDEO_DB, "w") as f:
             json.dump([], f)
     
+    # Create downloads folder
     os.makedirs("downloads", exist_ok=True)
     
-    await main_app.start()
-    await video_app.start()
-    
-    asyncio.create_task(keep_alive())
-    
-    logger.info("✅ Both bots started successfully!")
-    logger.info(f"📹 Total videos: {get_video_count()}")
-    
-    await asyncio.Event().wait()
+    try:
+        # Start both bots
+        await main_app.start()
+        logger.info("✅ Main bot started!")
+        
+        await video_app.start()
+        logger.info("✅ Video bot started!")
+        
+        # Start keep alive
+        asyncio.create_task(keep_alive())
+        
+        logger.info("✅ Both bots started successfully!")
+        logger.info(f"📹 Total videos: {get_video_count()}")
+        logger.info("💎 Premium Bot is ready!")
+        
+        # Keep running
+        await asyncio.Event().wait()
+        
+    except Exception as e:
+        logger.error(f"❌ Error starting bots: {e}")
 
+# ========== RUN ==========
 if __name__ == "__main__":
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
-        logger.info("👋 Bots stopped")
+        logger.info("👋 Bots stopped by user")
     except Exception as e:
         logger.error(f"❌ Fatal error: {e}")
