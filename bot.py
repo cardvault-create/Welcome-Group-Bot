@@ -38,18 +38,47 @@ LINE_BIG = "━━━━━━━━━━━━━━━━━━━━━━"
 # ========== USED VIDEOS TRACKING ==========
 used_video_ids = []
 
-# ========== ERROR MESSAGES ==========
+# ========== ERROR MESSAGES WITH BUTTON ==========
+def get_owner_button():
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton("📩 Contact Father", url=f"https://t.me/{OWNER_USERNAME}")]
+    ])
+
 OWNER_ERROR_MSG = f"""❌{LINE}❌
+  ☆ 
+  .•° <b>Hey! You can't use this command!</b> ❗
+  ✾ <b>This User Is A Bot Father, You Can't Do Anything!</b> °˳˳˳!!♡🇵🇹
+❌{LINE}❌"""
+
+ADMIN_ERROR_MSG = f"""❌{LINE}❌
+  ☆ 
+  .•° <b>Hey! You can't use this command!</b> ❗
+  ✾ <b>This User Is A Group Admin, You Can't Do Anything!</b> °˳˳˳!!♡🇵🇹
+❌{LINE}❌"""
+
+REVOKED_ERROR_MSG = f"""❌{LINE}❌
   ☆ 
   .•° <b>Hey! You can't use this command!</b> ❗
   ✾ <b>Only Bot Father Can Restore, You Can't Do Anything!</b> °˳˳˳!!♡🇵🇹
 ❌{LINE}❌"""
 
-ADMIN_ERROR_MSG = f"""❌{LINE}❌
-   ☆ 
-   .•° <b>Error</b> ✖️
-   ✾ <b>Hey! This user is a group admin!</b> °˳˳˳!!♡🇵🇹
-❌{LINE}❌"""
+UNAUTHORIZED_MSG = f"""❌{LINE}❌
+   ⛔️ <b>UNAUTHORIZED!</b> ⛔️
+❌{LINE}❌
+
+<b>Hey</b> {{user}}! 👋
+
+<b>This bot is only for the owner!</b> 🚫
+<b>Please don't try to use!</b> ❌
+
+<b>If you want to add this bot to your group,</b> 📌
+<b>Contact</b> <b>BEST CHEAT OWNER</b> 💬
+
+{LINE_BIG}
+🕐 {{time}}  •  📅 {{date}}
+{LINE_BIG}
+🚫 <b>RESTRICTED ACCESS</b> 🚫
+{LINE_BIG}"""
 
 # ========== DATABASE FUNCTIONS ==========
 def load_videos():
@@ -270,7 +299,7 @@ def get_unmute_time(until_str):
 def parse_time(time_str):
     if time_str.endswith('s'):
         val = int(time_str[:-1])
-        if 1 <= val <= 60:
+        if 30 <= val <= 60:
             return val, "second"
     elif time_str.endswith('m'):
         val = int(time_str[:-1])
@@ -802,6 +831,33 @@ async def is_user_in_group(chat_id, user_id):
     except:
         return False
 
+# ========== GET USER FROM ID OR USERNAME ==========
+async def get_user_from_input(client, input_str, chat_id):
+    try:
+        # Check if it's a numeric ID
+        if input_str.isdigit():
+            user_id = int(input_str)
+            try:
+                user = await client.get_users(user_id)
+                return user
+            except:
+                # Check if user is in group
+                try:
+                    member = await client.get_chat_member(chat_id, user_id)
+                    return member.user
+                except:
+                    return None
+        else:
+            # Try to get by username (remove @ if present)
+            username = input_str.replace("@", "")
+            try:
+                user = await client.get_users(username)
+                return user
+            except:
+                return None
+    except:
+        return None
+
 # ========== SEND NOTIFICATION ==========
 async def send_notification(chat_id, user_mention, msg_template, extra=None):
     try:
@@ -939,7 +995,7 @@ async def mute_user(client, message: Message):
             return
         
         if not is_owner(user_id):
-            await message.reply_text(OWNER_ERROR_MSG)
+            await message.reply_text(REVOKED_ERROR_MSG, reply_markup=get_owner_button())
             return
         
         if not message.reply_to_message:
@@ -955,11 +1011,11 @@ async def mute_user(client, message: Message):
         target_id = target.id
         
         if target_id == OWNER_ID:
-            await message.reply_text(OWNER_ERROR_MSG)
+            await message.reply_text(OWNER_ERROR_MSG, reply_markup=get_owner_button())
             return
         
         if await is_admin(chat_id, target_id):
-            await message.reply_text(ADMIN_ERROR_MSG)
+            await message.reply_text(ADMIN_ERROR_MSG, reply_markup=get_owner_button())
             return
         
         if not await is_user_in_group(chat_id, target_id):
@@ -968,14 +1024,14 @@ async def mute_user(client, message: Message):
         
         parts = message.text.split()
         if len(parts) < 2:
-            await message.reply_text(f"❌{LINE}❌\n   **__/tmkc 1s-60s/1m-60m/1w-3w/1d-30d__**\n❌{LINE}❌")
+            await message.reply_text(f"❌{LINE}❌\n   **__/tmkc 30-60s/1m-60m/1w-3w/1d-30d__**\n❌{LINE}❌")
             return
         
         time_str = parts[1]
         value, unit = parse_time(time_str)
         
         if value is None:
-            await message.reply_text(f"❌{LINE}❌\n   **__Invalid time!__**\n   Use: 1s-60s / 1m-60m / 1w-3w / 1d-30d\n❌{LINE}❌")
+            await message.reply_text(f"❌{LINE}❌\n   **__Invalid time!__**\n   Use: 30-60s / 1m-60m / 1w-3w / 1d-30d\n❌{LINE}❌")
             return
         
         delta = timedelta(**{f"{unit}s": value})
@@ -1027,7 +1083,6 @@ async def mute_user(client, message: Message):
         else:
             await app.send_message(chat_id, msg_text)
         
-        # 🔴 START AUTO UNMUTE TASK
         asyncio.create_task(auto_unmute(chat_id, target_id, target.first_name, until_time))
         logger.info(f"🔇 MUTED: {target.first_name} for {duration}")
         
@@ -1050,7 +1105,7 @@ async def unmute_user(client, message: Message):
             return
         
         if not is_owner(user_id):
-            await message.reply_text(OWNER_ERROR_MSG)
+            await message.reply_text(REVOKED_ERROR_MSG, reply_markup=get_owner_button())
             return
         
         if not message.reply_to_message:
@@ -1118,7 +1173,7 @@ async def unmute_user(client, message: Message):
 async def revoke_user(client, message: Message):
     try:
         if not is_owner(message.from_user.id):
-            await message.reply_text(OWNER_ERROR_MSG)
+            await message.reply_text(OWNER_ERROR_MSG, reply_markup=get_owner_button())
             return
         
         chat_id = message.chat.id
@@ -1169,12 +1224,12 @@ async def revoke_user(client, message: Message):
     except Exception as e:
         logger.error(f"❌ Revoke error: {e}")
 
-# ========== UNREVOKE MUTE (OWNER ONLY) ==========
+# ========== UNREVOKE MUTE (OWNER ONLY) - WITH ID SUPPORT ==========
 @app.on_message(filters.group & filters.command("unrevokemute"))
 async def unrevoke_user(client, message: Message):
     try:
         if not is_owner(message.from_user.id):
-            await message.reply_text(OWNER_ERROR_MSG)
+            await message.reply_text(OWNER_ERROR_MSG, reply_markup=get_owner_button())
             return
         
         chat_id = message.chat.id
@@ -1184,24 +1239,37 @@ async def unrevoke_user(client, message: Message):
         except:
             pass
         
-        if not message.reply_to_message:
-            await message.reply_text(f"❌{LINE}❌\n   **__Reply to a user!__**\n❌{LINE}❌")
-            return
+        target = None
+        target_id = None
         
-        target = message.reply_to_message.from_user
+        # Check if reply to a user
+        if message.reply_to_message:
+            target = message.reply_to_message.from_user
+            if target:
+                target_id = target.id
         
+        # If no reply, check for ID or username in command
         if target is None:
-            await message.reply_text(f"❌{LINE}❌\n   **__User not found or deleted!__**\n❌{LINE}❌")
+            parts = message.text.split()
+            if len(parts) >= 2:
+                input_str = parts[1]
+                target = await get_user_from_input(app, input_str, chat_id)
+                if target:
+                    target_id = target.id
+        
+        # If still no target, show error
+        if target is None or target_id is None:
+            await message.reply_text(f"❌{LINE}❌\n   **__Reply to a user or provide ID/Username!__**\n   **__Usage: /unrevokemute 123456789__**\n❌{LINE}❌")
             return
         
-        target_id = target.id
-        
+        # Check if user is revoked
         if not remove_revoke(chat_id, target_id):
             await message.reply_text(f"❌{LINE}❌\n   **__User is not revoked!__**\n❌{LINE}❌")
             return
         
         remove_mute(chat_id, target_id)
         
+        # Unrestrict user
         try:
             await app.restrict_chat_member(
                 chat_id=chat_id,
@@ -1237,7 +1305,7 @@ async def unrevoke_user(client, message: Message):
         else:
             await app.send_message(chat_id, msg_text)
         
-        logger.info(f"🔊 UNREVOKED: {target.first_name}")
+        logger.info(f"🔊 UNREVOKED: {target.first_name} (ID: {target_id})")
         
     except Exception as e:
         logger.error(f"❌ Unrevoke error: {e}")
@@ -1275,7 +1343,7 @@ async def revoke_list(client, message: Message):
         logger.error(f"❌ Revoke list error: {e}")
         await message.reply_text(f"❌ **__Error:__** {str(e)}")
 
-# ========== 🔴 FIXED AUTO UNMUTE ==========
+# ========== AUTO UNMUTE ==========
 async def auto_unmute(chat_id, user_id, user_name, until_time):
     try:
         now = datetime.now()
@@ -1289,18 +1357,10 @@ async def auto_unmute(chat_id, user_id, user_name, until_time):
         if wait_seconds > 0:
             await asyncio.sleep(wait_seconds)
         
-        # 🔴 FIX 1: Check if revoked
         if is_revoked(chat_id, user_id):
             logger.info(f"🔇 User {user_name} is revoked, skipping auto-unmute")
-            # Still try to send notification that user is revoked
-            user_mention = f"[{user_name}](tg://user?id={user_id})"
-            time = get_current_time()
-            date = get_current_date()
-            msg_text = f"🔇 {LINE} 🔇\n   **__User is revoked!__**\n   Messages will be deleted!\n{LINE}"
-            await app.send_message(chat_id, msg_text)
             return
         
-        # 🔴 FIX 2: Check if already unmuted by checking permissions
         is_restricted = False
         try:
             member = await app.get_chat_member(chat_id, user_id)
@@ -1310,10 +1370,8 @@ async def auto_unmute(chat_id, user_id, user_name, until_time):
         except Exception as e:
             logger.info(f"ℹ️ Could not check user status: {e}")
         
-        # 🔴 FIX 3: ALWAYS try to remove from database
         remove_mute(chat_id, user_id)
         
-        # 🔴 FIX 4: ALWAYS try to unrestrict if restricted
         if is_restricted:
             try:
                 await app.restrict_chat_member(
@@ -1329,11 +1387,9 @@ async def auto_unmute(chat_id, user_id, user_name, until_time):
                 logger.info(f"🔊 Auto-unmuted: {user_name}")
             except Exception as e:
                 logger.error(f"❌ Auto-unmute restrict error: {e}")
-                # Still send notification even if restrict fails
         else:
             logger.info(f"ℹ️ User {user_name} is already unmuted, but sending notification anyway")
         
-        # 🔴 FIX 5: ALWAYS send notification with video
         user_mention = f"[{user_name}](tg://user?id={user_id})"
         time = get_current_time()
         date = get_current_date()
@@ -1363,7 +1419,6 @@ async def auto_unmute(chat_id, user_id, user_name, until_time):
         logger.info(f"⏹️ Auto-unmute cancelled for {user_name}")
     except Exception as e:
         logger.error(f"❌ Auto unmute error: {e}")
-        # 🔴 FIX 6: Try to send notification even if error
         try:
             user_mention = f"[{user_name}](tg://user?id={user_id})"
             time = get_current_time()
@@ -1398,26 +1453,12 @@ async def delete_revoked_messages(client, message: Message):
 async def start_command(client, message):
     if not is_owner(message.from_user.id):
         await message.reply_text(
-            f"""❌{LINE}❌
-   ⛔️ **__𝗨𝗡𝗔𝗨𝗧𝗛𝗢𝗥𝗜𝗭𝗘𝗗!__** ⛔️
-❌{LINE}❌
-
-**__𝗛𝗲𝘆__** {message.from_user.first_name}! 👋
-
-𝐓𝐡𝐢𝐬 𝐛𝐨𝐭 𝐢𝐬 𝐨𝐧𝐥𝐲 𝐟𝐨𝐫 𝐭𝐡𝐞 𝐨𝐰𝐧𝐞𝐫! 🚫
-𝐏𝐥𝐞𝐚𝐬𝐞 𝐝𝐨𝐧'𝐭 𝐭𝐫𝐲 𝐭𝐨 𝐮𝐬𝐞! ❌
-
-𝐈𝐟 𝐲𝐨𝐮 𝐰𝐚𝐧𝐭 𝐭𝐨 𝐚𝐝𝐝 𝐭𝐡𝐢𝐬 𝐛𝐨𝐭 𝐭𝐨 𝐲𝐨𝐮𝐫 𝐠𝐫𝐨𝐮𝐩, 📌
-𝐂𝐨𝐧𝐭𝐚𝐜𝐭 **__𝐁𝐄𝐒𝐓 𝘾𝙃𝙀𝘼𝙏 ᵒʷⁿᵉʳ__** 💬
-
-{LINE_BIG}
-🕐 {get_current_time()}  •  📅 {get_current_date()}
-{LINE_BIG}
-🚫 **__𝗥𝗘𝗦𝗧𝗥𝗜𝗖𝗧𝗘𝗗 𝗔𝗖𝗖𝗘𝗦𝗦__** 🚫
-{LINE_BIG}""",
-            reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton("📩 ᴄᴏɴᴛᴀᴄᴛ ᴏᴡɴᴇʀ", url=f"https://t.me/{OWNER_USERNAME}")]
-            ])
+            UNAUTHORIZED_MSG.format(
+                user=message.from_user.first_name,
+                time=get_current_time(),
+                date=get_current_date()
+            ),
+            reply_markup=get_owner_button()
         )
         return
     
@@ -1447,10 +1488,10 @@ async def start_command(client, message):
 🔄 **__/toggle__** - **__ᴛᴏɢɢʟᴇ__**
 
 🔇 **__MUTE SYSTEM__**
-• `/tmkc 1s-60s/1m-60m/1w-3w/1d-30d` - **__ᴛᴇᴍᴘ__**
+• `/tmkc` - **__ᴛᴇᴍᴘ__**
 • `/tbur` - **__ᴜɴᴍᴜᴛᴇ__**
-• `/revokemute ` - **__ʀᴇᴠᴏᴋᴇ__**
-• `/unrevokemute ` - **__ᴜɴʀᴇᴠᴏᴋᴇ__**
+• `/revokemute` - **__ʀᴇᴠᴏᴋᴇ__**
+• `/unrevokemute` - **__ᴜɴʀᴇᴠᴏᴋᴇ__**
 • `/revokemutelist` - **__ʀᴇᴠᴏᴋᴇᴅ ʟɪsᴛ__**
 
 📊 **__/stats__** - **__sᴛᴀᴛs__**
