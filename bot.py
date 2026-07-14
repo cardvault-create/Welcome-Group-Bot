@@ -14,16 +14,15 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# ========== CONFIGURATION FROM ENVIRONMENT ==========
+# ========== CONFIGURATION ==========
 API_ID = int(os.getenv("API_ID", 35140329))
 API_HASH = os.getenv("API_HASH", "011f638e4acadee178c59afffc80193d")
 MAIN_BOT_TOKEN = os.getenv("MAIN_BOT_TOKEN", "8603632286:AAHD-EKEJKpWXoOYZTbJOsQd9dCTVLxPEnI")
 VIDEO_BOT_TOKEN = os.getenv("VIDEO_BOT_TOKEN", "8988202401:AAFagkU0KwAPiEesXrE9ND3rVRdlJmf4guo")
 
-# Database file
 VIDEO_DB = "videos.json"
 
-# ========== VIDEO DATABASE FUNCTIONS ==========
+# ========== VIDEO DATABASE ==========
 def load_videos():
     try:
         if os.path.exists(VIDEO_DB):
@@ -70,9 +69,9 @@ def get_video_count():
 
 # ========== PREMIUM MESSAGES ==========
 JOIN_MESSAGES = [
-    """🌟━━━━━━━━━━━━━━━━━🌟
+    f"""🌟━━━━━━━━━━━━━━━━━🌟
 ┏━━━━━━━━━━━━━━━━━┓
-┃ ✨ **{user}** ✨
+┃ ✨ {{user}} ✨
 ┃ 🎯 **JOINED** the group!
 ┗━━━━━━━━━━━━━━━━━┛
 🌟━━━━━━━━━━━━━━━━━🌟
@@ -80,9 +79,9 @@ JOIN_MESSAGES = [
 🎉 **ᴡᴇʟᴄᴏᴍᴇ** ᴛᴏ ᴛʜᴇ **ᴘʀᴇᴍɪᴜᴍ** ғᴀᴍɪʟʏ! 🏆
 💎 **ʏᴏᴜ'ʀᴇ** ᴛʜᴇ **ʙᴇsᴛ** ᴀᴅᴅɪᴛɪᴏɴ ᴛᴏᴅᴀʏ! 🔥""",
 
-    """💫━━━━━━━━━━━━━━━━━💫
+    f"""💫━━━━━━━━━━━━━━━━━💫
 ╔━━━━━━━━━━━━━━━━━╗
-║ 🚀 **{user}** 🚀
+║ 🚀 {{user}} 🚀
 ║ 👑 **ENTERED** the arena!
 ╚━━━━━━━━━━━━━━━━━╝
 💫━━━━━━━━━━━━━━━━━💫
@@ -92,9 +91,9 @@ JOIN_MESSAGES = [
 ]
 
 LEFT_MESSAGES = [
-    """😔━━━━━━━━━━━━━━━━━😔
+    f"""😔━━━━━━━━━━━━━━━━━😔
 ┏━━━━━━━━━━━━━━━━━┓
-┃ 💔 **{user}** 💔
+┃ 💔 {{user}} 💔
 ┃ 🚶 **LEFT** the group!
 ┗━━━━━━━━━━━━━━━━━┛
 😔━━━━━━━━━━━━━━━━━😔
@@ -104,9 +103,9 @@ LEFT_MESSAGES = [
 ]
 
 BAN_MESSAGES = [
-    """🚫━━━━━━━━━━━━━━━━━🚫
+    f"""🚫━━━━━━━━━━━━━━━━━🚫
 ┏━━━━━━━━━━━━━━━━━┓
-┃ ⛔️ **{user}** ⛔️
+┃ ⛔️ {{user}} ⛔️
 ┃ 🔨 **BANNED** from group!
 ┗━━━━━━━━━━━━━━━━━┛
 🚫━━━━━━━━━━━━━━━━━🚫
@@ -115,7 +114,7 @@ BAN_MESSAGES = [
 ❌ **ᴀᴄᴛɪᴏɴ** ʜᴀs ʙᴇᴇɴ **ᴛᴀᴋᴇɴ**! 💥"""
 ]
 
-# ========== MAIN BOT ==========
+# ========== BOTS ==========
 main_app = Client(
     "main_bot",
     api_id=API_ID,
@@ -124,7 +123,6 @@ main_app = Client(
     workdir="./downloads"
 )
 
-# ========== VIDEO BOT ==========
 video_app = Client(
     "video_bot",
     api_id=API_ID,
@@ -151,8 +149,10 @@ async def send_premium_notification(chat_id, user_mention, message_template):
                 caption=msg_text,
                 supports_streaming=True
             )
+            logger.info(f"📹 Video sent: {video_data['path']}")
         else:
             await main_app.send_message(chat_id=chat_id, text=msg_text)
+            logger.info("📝 Message sent (no video)")
     except Exception as e:
         logger.error(f"❌ Error: {e}")
 
@@ -233,13 +233,84 @@ async def list_videos(client, message):
         text += f"{used} **{i}.** `{os.path.basename(video['path'])}`\n"
     await message.reply_text(text)
 
+@video_app.on_message(filters.command("delete") & filters.private)
+async def delete_video(client, message):
+    try:
+        parts = message.text.split()
+        if len(parts) != 2:
+            await message.reply_text("❌ **ᴜsᴀɢᴇ:** `/delete 1`")
+            return
+        
+        index = int(parts[1]) - 1
+        videos = load_videos()
+        
+        if 0 <= index < len(videos):
+            deleted = videos.pop(index)
+            with open(VIDEO_DB, "w") as f:
+                json.dump(videos, f, indent=2)
+            
+            if os.path.exists(deleted["path"]):
+                os.remove(deleted["path"])
+            
+            await message.reply_text(
+                f"✅ **ᴠɪᴅᴇᴏ ᴅᴇʟᴇᴛᴇᴅ!** 🗑️\n\n"
+                f"📹 **ʀᴇᴍᴀɪɴɪɴɢ:** {len(videos)}"
+            )
+        else:
+            await message.reply_text("❌ **ɪɴᴠᴀʟɪᴅ ɴᴜᴍʙᴇʀ!**")
+    except:
+        await message.reply_text("❌ **ɪɴᴠᴀʟɪᴅ ғᴏʀᴍᴀᴛ!**")
+
+@video_app.on_message(filters.command("clear") & filters.private)
+async def clear_videos(client, message):
+    videos = load_videos()
+    if not videos:
+        await message.reply_text("❌ **ɴᴏ ᴠɪᴅᴇᴏs ᴛᴏ ᴄʟᴇᴀʀ!**")
+        return
+    
+    for video in videos:
+        if os.path.exists(video["path"]):
+            os.remove(video["path"])
+    
+    with open(VIDEO_DB, "w") as f:
+        json.dump([], f)
+    
+    await message.reply_text(
+        f"🗑️ **ᴀʟʟ ᴠɪᴅᴇᴏs ᴄʟᴇᴀʀᴇᴅ!**\n\n"
+        f"📹 **ʀᴇᴍᴏᴠᴇᴅ:** {len(videos)} ᴠɪᴅᴇᴏs"
+    )
+
+@video_app.on_message(filters.command("stats") & filters.private)
+async def stats_command(client, message):
+    videos = load_videos()
+    total_size = 0
+    used = 0
+    
+    for video in videos:
+        if os.path.exists(video["path"]):
+            total_size += os.path.getsize(video["path"])
+        if video.get("used", False):
+            used += 1
+    
+    text = f"""📊 **ᴠɪᴅᴇᴏ sᴛᴀᴛɪsᴛɪᴄs**
+
+━━━━━━━━━━━━━━━━━
+📹 **ᴛᴏᴛᴀʟ ᴠɪᴅᴇᴏs:** `{len(videos)}`
+🔄 **ᴜɴᴜsᴇᴅ:** `{len(videos) - used}`
+✅ **ᴜsᴇᴅ:** `{used}`
+💾 **ᴛᴏᴛᴀʟ sɪᴢᴇ:** `{total_size / (1024*1024):.2f} MB`
+━━━━━━━━━━━━━━━━━
+💎 **ᴘʀᴇᴍɪᴜᴍ** sᴛᴏʀᴀɢᴇ 💎"""
+    
+    await message.reply_text(text)
+
 # ========== KEEP ALIVE ==========
 async def keep_alive():
     while True:
         await asyncio.sleep(300)
         logger.info("💓 Keep-alive ping")
 
-# ========== MAIN FUNCTION ==========
+# ========== MAIN ==========
 async def main():
     logger.info("🚀 Starting Premium Bots...")
     
