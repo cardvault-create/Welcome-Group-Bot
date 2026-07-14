@@ -45,7 +45,7 @@ def get_owner_button():
     ])
 
 REPLY_ERROR_MSG = f"""❌{LINE}❌
-   Reply to a user!
+   <b>Reply to a user!</b>
 ❌{LINE}❌"""
 
 USER_ERROR_MSG = f"""❌{LINE}❌
@@ -800,15 +800,17 @@ print("🔧 Creating bot...")
 app = Client("premium_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 print("✅ Bot created!")
 
-# ========== CHECK FUNCTIONS ==========
+# ========== 🔴 CHECK FUNCTIONS - FIXED ==========
 def is_owner(user_id):
     return user_id == OWNER_ID
 
 async def is_admin_or_creator(chat_id, user_id):
     try:
         member = await app.get_chat_member(chat_id, user_id)
+        logger.info(f"🔍 User {user_id} status: {member.status}")
         return member.status in ["administrator", "creator"]
-    except:
+    except Exception as e:
+        logger.error(f"❌ Admin check error: {e}")
         return False
 
 async def is_user_in_group(chat_id, user_id):
@@ -919,7 +921,7 @@ async def service_handler(client, message: Message):
     except Exception as e:
         logger.error(f"❌ Error in service_handler: {e}")
 
-# ========== 🔴 MUTE COMMAND - FIXED ==========
+# ========== 🔴 MUTE COMMAND ==========
 @app.on_message(filters.group & filters.command("tmkc"))
 async def mute_user(client, message: Message):
     try:
@@ -1033,7 +1035,7 @@ async def mute_user(client, message: Message):
         logger.error(f"❌ Mute error: {e}")
         await message.reply_text(f"❌ **__Error:__** {str(e)}")
 
-# ========== 🔴 UNMUTE COMMAND - FIXED ==========
+# ========== 🔴 UNMUTE COMMAND ==========
 @app.on_message(filters.group & filters.command("tbur"))
 async def unmute_user(client, message: Message):
     try:
