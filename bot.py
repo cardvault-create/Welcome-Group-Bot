@@ -6,7 +6,7 @@ import logging
 from datetime import datetime
 import pytz
 from pyrogram import Client, filters
-from pyrogram.types import ChatMemberUpdated, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
+from pyrogram.types import Message
 
 # ========== LOGGING ==========
 logging.basicConfig(
@@ -19,12 +19,11 @@ logger = logging.getLogger(__name__)
 API_ID = 35140329  # 🔴 my.telegram.org se
 API_HASH = "011f638e4acadee178c59afffc80193d"  # 🔴 my.telegram.org se
 BOT_TOKEN = "8603632286:AAE8Hw5xWzKjrpr4r7PrrMifZxu7-v93TaM"  # 🔴 @BotFather se
-OWNER_ID = 7614459746  # 🔴 APNA TELEGRAM USER ID (owner)
+OWNER_ID = 7614459746  # 🔴 APNA TELEGRAM USER ID
 
 # ========== DATABASE ==========
 VIDEO_DB = "videos.json"
 GROUPS_DB = "groups.json"
-SETTINGS_DB = "settings.json"
 
 # ========== TIMEZONE ==========
 IST = pytz.timezone('Asia/Kolkata')
@@ -51,7 +50,7 @@ def save_video(video_path):
     })
     with open(VIDEO_DB, "w") as f:
         json.dump(videos, f, indent=2)
-    logger.info(f"✅ Video #{video_id} saved: {video_path}")
+    logger.info(f"✅ Video #{video_id} saved")
     return video_id
 
 def get_unused_video():
@@ -77,13 +76,6 @@ def get_unused_video():
 
 def get_video_count():
     return len(load_videos())
-
-def get_video_by_id(video_id):
-    videos = load_videos()
-    for video in videos:
-        if video["id"] == video_id:
-            return video
-    return None
 
 def delete_video_by_id(video_id):
     videos = load_videos()
@@ -177,21 +169,6 @@ JOIN_MESSAGES = [
 ━━━━━━━━━━━━━━━━━━━━━━━
 🕐 **ᴛɪᴍᴇ:** `{time}`
 📅 **ᴅᴀᴛᴇ:** `{date}`
-━━━━━━━━━━━━━━━━━━━━━━━""",
-
-    """🔥━━━━━━━━━━━━━━━━━━━━━━━🔥
-╔━━━━━━━━━━━━━━━━━━━━━━━╗
-║ ⭐️ **{user}** ⭐️
-║ 🎊 **WELCOME** aboard!
-╚━━━━━━━━━━━━━━━━━━━━━━━╝
-🔥━━━━━━━━━━━━━━━━━━━━━━━🔥
-
-🌈 **ɴᴇᴡ** ᴍᴇᴍʙᴇʀ **ᴜɴʟᴏᴄᴋᴇᴅ**! 🗝️
-💫 **ᴛʜᴇ** ғᴀᴍɪʟʏ **ɢʀᴏᴡs** ʙʏ ᴏɴᴇ! 🎉
-
-━━━━━━━━━━━━━━━━━━━━━━━
-🕐 **ᴛɪᴍᴇ:** `{time}`
-📅 **ᴅᴀᴛᴇ:** `{date}`
 ━━━━━━━━━━━━━━━━━━━━━━━"""
 ]
 
@@ -209,21 +186,6 @@ LEFT_MESSAGES = [
 ━━━━━━━━━━━━━━━━━━━━━━━
 🕐 **ᴛɪᴍᴇ:** `{time}`
 📅 **ᴅᴀᴛᴇ:** `{date}`
-━━━━━━━━━━━━━━━━━━━━━━━""",
-
-    """🌧️━━━━━━━━━━━━━━━━━━━━━━━🌧️
-╔━━━━━━━━━━━━━━━━━━━━━━━╗
-║ 👋 **{user}** 👋
-║ 🚪 **EXITED** the group!
-╚━━━━━━━━━━━━━━━━━━━━━━━╝
-🌧️━━━━━━━━━━━━━━━━━━━━━━━🌧️
-
-😢 **sᴀᴅ** ᴛᴏ sᴇᴇ ʏᴏᴜ **ʟᴇᴀᴠᴇ**! 💔
-🌟 **ʏᴏᴜ'ʟʟ** ʙᴇ **ᴍɪssᴇᴅ** ʜᴇʀᴇ! 🥺
-
-━━━━━━━━━━━━━━━━━━━━━━━
-🕐 **ᴛɪᴍᴇ:** `{time}`
-📅 **ᴅᴀᴛᴇ:** `{date}`
 ━━━━━━━━━━━━━━━━━━━━━━━"""
 ]
 
@@ -237,21 +199,6 @@ BAN_MESSAGES = [
 
 ⚖️ **ʀᴜʟᴇs** ᴡᴇʀᴇ **ʙʀᴏᴋᴇɴ**! 🚨
 ❌ **ᴀᴄᴛɪᴏɴ** ʜᴀs ʙᴇᴇɴ **ᴛᴀᴋᴇɴ**! 💥
-
-━━━━━━━━━━━━━━━━━━━━━━━
-🕐 **ᴛɪᴍᴇ:** `{time}`
-📅 **ᴅᴀᴛᴇ:** `{date}`
-━━━━━━━━━━━━━━━━━━━━━━━""",
-
-    """🔒━━━━━━━━━━━━━━━━━━━━━━━🔒
-╔━━━━━━━━━━━━━━━━━━━━━━━╗
-║ 🚷 **{user}** 🚷
-║ 🔐 **PERMANENTLY** banned!
-╚━━━━━━━━━━━━━━━━━━━━━━━╝
-🔒━━━━━━━━━━━━━━━━━━━━━━━🔒
-
-⛓️ **sᴇᴄᴜʀɪᴛʏ** ᴍᴇᴀsᴜʀᴇs **ᴀᴄᴛɪᴠᴀᴛᴇᴅ**! 🛡️
-🗑️ **ʀᴇᴍᴏᴠᴇᴅ** ғʀᴏᴍ ᴛʜᴇ **ᴄᴏᴍᴍᴜɴɪᴛʏ**! ❌
 
 ━━━━━━━━━━━━━━━━━━━━━━━
 🕐 **ᴛɪᴍᴇ:** `{time}`
@@ -275,14 +222,150 @@ print("✅ Bot created!")
 def is_owner(user_id):
     return user_id == OWNER_ID
 
-# ========== COMMAND: START ==========
+# ========== SEND PREMIUM NOTIFICATION ==========
+async def send_premium_notification(chat_id, user_mention, message_template, event_type):
+    try:
+        time = get_current_time()
+        date = get_current_date()
+        
+        msg_text = message_template.format(
+            user=user_mention,
+            time=time,
+            date=date
+        )
+        
+        emojis = ["🔥", "✨", "💎", "🌟", "🎉", "🚀", "👑", "💫"]
+        footer = random.sample(emojis, 3)
+        msg_text += f"\n\n{footer[0]} **ᴘʀᴇᴍɪᴜᴍ** {footer[1]} **ᴜᴘᴅᴀᴛᴇ** {footer[2]}"
+        
+        video_data = get_unused_video()
+        
+        if video_data and os.path.exists(video_data["path"]):
+            await app.send_video(
+                chat_id=chat_id,
+                video=video_data["path"],
+                caption=msg_text,
+                supports_streaming=True
+            )
+            logger.info(f"📹 Video #{video_data['id']} sent to {chat_id}")
+        else:
+            await app.send_message(chat_id=chat_id, text=msg_text)
+            logger.info(f"📝 Message sent to {chat_id} (no video)")
+    except Exception as e:
+        logger.error(f"❌ Error: {e}")
+
+# ========== 🔴 GROUP AUTO-ADD HANDLER ==========
+@app.on_message(filters.group & filters.command("addgroup") & filters.user(OWNER_ID))
+async def add_group_from_group(client, message: Message):
+    try:
+        chat_id = message.chat.id
+        chat_name = message.chat.title or f"Group {chat_id}"
+        
+        # Save group
+        save_group(chat_id, chat_name)
+        
+        # Premium confirmation message
+        confirm_text = f"""✅━━━━━━━━━━━━━━━━━━━━━━━✅
+┏━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ **ɢʀᴏᴜᴘ ᴀᴅᴅᴇᴅ** 🎉
+┗━━━━━━━━━━━━━━━━━━━━━━━┛
+✅━━━━━━━━━━━━━━━━━━━━━━━✅
+
+📛 **ɴᴀᴍᴇ:** `{chat_name}`
+🆔 **ɪᴅ:** `{chat_id}`
+📅 **ᴛɪᴍᴇ:** `{get_current_time()}`
+📆 **ᴅᴀᴛᴇ:** `{get_current_date()}`
+
+🌟 **sᴛᴀᴛᴜs:** ✅ ᴀᴄᴛɪᴠᴇ
+
+━━━━━━━━━━━━━━━━━━━━━━━
+💎 **ᴘʀᴇᴍɪᴜᴍ** ᴇɴᴀʙʟᴇᴅ 💎
+━━━━━━━━━━━━━━━━━━━━━━━
+
+⚡️ **ɴᴏᴡ ᴍᴏɴɪᴛᴏʀɪɴɢ:**
+• 👤 Jᴏɪɴs
+• 🚶 Lᴇᴀᴠᴇs
+• 🚫 Bᴀɴs"""
+
+        # Send confirmation
+        sent_msg = await message.reply_text(confirm_text)
+        
+        # Auto-delete after 5 seconds
+        await asyncio.sleep(5)
+        try:
+            await sent_msg.delete()
+            await message.delete()  # Delete command message too
+        except:
+            pass
+        
+        logger.info(f"✅ Group auto-added: {chat_name} ({chat_id})")
+        
+    except Exception as e:
+        await message.reply_text(f"❌ **ᴇʀʀᴏʀ:** {str(e)}")
+        logger.error(f"❌ Error in group add: {e}")
+
+# ========== 🔴 SERVICE MESSAGES HANDLER ==========
+@app.on_message(filters.group & filters.service)
+async def service_message_handler(client, message: Message):
+    try:
+        chat_id = message.chat.id
+        
+        # Check if group is enabled
+        if not is_group_enabled(chat_id):
+            return
+        
+        # Check for new chat members (JOIN)
+        if message.new_chat_members:
+            for user in message.new_chat_members:
+                if user.is_bot:
+                    continue
+                mention = f"[{user.first_name}](tg://user?id={user.id})"
+                await send_premium_notification(
+                    chat_id,
+                    mention,
+                    random.choice(JOIN_MESSAGES),
+                    "JOIN"
+                )
+                logger.info(f"👤 JOIN: {user.first_name} in {chat_id}")
+        
+        # Check for left chat member (LEFT or BAN)
+        elif message.left_chat_member:
+            user = message.left_chat_member
+            if user.is_bot:
+                return
+                
+            mention = f"[{user.first_name}](tg://user?id={user.id})"
+            
+            # Check if user was kicked (banned)
+            # In service messages, if someone is banned, the message type is different
+            if hasattr(message, 'new_chat_members') and message.new_chat_members is None:
+                # This is a ban/kick
+                await send_premium_notification(
+                    chat_id,
+                    mention,
+                    random.choice(BAN_MESSAGES),
+                    "BAN"
+                )
+                logger.info(f"🚫 BANNED: {user.first_name} in {chat_id}")
+            else:
+                # Normal left
+                await send_premium_notification(
+                    chat_id,
+                    mention,
+                    random.choice(LEFT_MESSAGES),
+                    "LEFT"
+                )
+                logger.info(f"🚶 LEFT: {user.first_name} in {chat_id}")
+                
+    except Exception as e:
+        logger.error(f"❌ Error in service handler: {e}")
+
+# ========== COMMANDS ==========
+
 @app.on_message(filters.command("start") & filters.private)
 async def start_command(client, message):
     if not is_owner(message.from_user.id):
-        await message.reply_text(
-            "❌ **ᴜɴᴀᴜᴛʜᴏʀɪᴢᴇᴅ ᴀᴄᴄᴇss!**\n\n"
-            "ᴛʜɪs ʙᴏᴛ ɪs ᴏɴʟʏ ғᴏʀ ᴛʜᴇ ᴏᴡɴᴇʀ."
-        )
+        await message.reply_text("❌ **ᴜɴᴀᴜᴛʜᴏʀɪᴢᴇᴅ ᴀᴄᴄᴇss!**")
         return
     
     await message.reply_text(
@@ -303,14 +386,14 @@ async def start_command(client, message):
 ━━━━━━━━━━━━━━━━━━━━━━━
 📹 **ᴠɪᴅᴇᴏ ᴍᴀɴᴀɢᴇᴍᴇɴᴛ**
 • `/addvideo` - ᴀᴅᴅ ᴠɪᴅᴇᴏ
-• `/videos` - ᴠɪᴇᴡ ᴀʟʟ ᴠɪᴅᴇᴏs
-• `/delvideo` - ᴅᴇʟᴇᴛᴇ ᴠɪᴅᴇᴏ
+• `/videos` - ᴠɪᴇᴡ ᴀʟʟ
+• `/delvideo` - ᴅᴇʟᴇᴛᴇ
 • `/clearvideos` - ᴄʟᴇᴀʀ ᴀʟʟ
 
 👥 **ɢʀᴏᴜᴘ ᴍᴀɴᴀɢᴇᴍᴇɴᴛ**
 • `/addgroup` - ᴀᴅᴅ ɢʀᴏᴜᴘ
-• `/groups` - ᴠɪᴇᴡ ᴀʟʟ ɢʀᴏᴜᴘs
-• `/delgroup` - ʀᴇᴍᴏᴠᴇ ɢʀᴏᴜᴘ
+• `/groups` - ᴠɪᴇᴡ ᴀʟʟ
+• `/delgroup` - ʀᴇᴍᴏᴠᴇ
 • `/toggle` - ᴇɴᴀʙʟᴇ/ᴅɪsᴀʙʟᴇ
 
 📊 **sᴛᴀᴛɪsᴛɪᴄs**
@@ -321,41 +404,32 @@ async def start_command(client, message):
 ━━━━━━━━━━━━━━━━━━━━━━━"""
     )
 
-# ========== COMMAND: ADD GROUP ==========
 @app.on_message(filters.command("addgroup") & filters.private)
-async def add_group_command(client, message):
+async def add_group_private(client, message):
     if not is_owner(message.from_user.id):
         return
     
     try:
-        # Get group from reply or command
-        if message.reply_to_message and message.reply_to_message.forward_from_chat:
-            group = message.reply_to_message.forward_from_chat
-            group_id = group.id
-            group_name = group.title or "Unknown Group"
-        else:
-            parts = message.text.split()
-            if len(parts) < 2:
-                await message.reply_text(
-                    "❌ **ᴜsᴀɢᴇ:** `/addgroup` (ʀᴇᴘʟʏ ᴛᴏ ᴀ ғᴏʀᴡᴀʀᴅᴇᴅ ᴍᴇssᴀɢᴇ ғʀᴏᴍ ɢʀᴏᴜᴘ)\n\n"
-                    "ᴏʀ\n\n"
-                    "`/addgroup -100123456789` (ɢʀᴏᴜᴘ ɪᴅ)"
-                )
-                return
-            group_id = int(parts[1])
-            group_name = f"Group {group_id}"
+        parts = message.text.split()
+        if len(parts) < 2:
+            await message.reply_text(
+                "❌ **ᴜsᴀɢᴇ:** `/addgroup -100123456789`\n\n"
+                "📌 **ᴛɪᴘ:** ɢʀᴏᴜᴘ ᴍᴇɪɴ `/addgroup` ᴛʏᴘᴇ ᴋᴀʀᴏ ᴀᴜᴛᴏ-ᴀᴅᴅ ʜᴏ ɢᴀʏᴇɢᴀ!"
+            )
+            return
+        
+        group_id = int(parts[1])
+        group_name = parts[2] if len(parts) > 2 else f"Group {group_id}"
         
         save_group(group_id, group_name)
         await message.reply_text(
-            f"✅ **ɢʀᴏᴜᴘ ᴀᴅᴅᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ!** 🎉\n\n"
+            f"✅ **ɢʀᴏᴜᴘ ᴀᴅᴅᴇᴅ!** 🎉\n\n"
             f"📛 **ɴᴀᴍᴇ:** `{group_name}`\n"
-            f"🆔 **ɪᴅ:** `{group_id}`\n"
-            f"📅 **ᴀᴅᴅᴇᴅ:** `{datetime.now(IST).strftime('%B %d, %Y %I:%M %p')}`"
+            f"🆔 **ɪᴅ:** `{group_id}`"
         )
     except Exception as e:
         await message.reply_text(f"❌ **ᴇʀʀᴏʀ:** {str(e)}")
 
-# ========== COMMAND: GROUPS LIST ==========
 @app.on_message(filters.command("groups") & filters.private)
 async def groups_list(client, message):
     if not is_owner(message.from_user.id):
@@ -363,7 +437,7 @@ async def groups_list(client, message):
     
     groups = get_all_groups()
     if not groups:
-        await message.reply_text("❌ **ɴᴏ ɢʀᴏᴜᴘs ᴀᴅᴅᴇᴅ ʏᴇᴛ!**")
+        await message.reply_text("❌ **ɴᴏ ɢʀᴏᴜᴘs ᴀᴅᴅᴇᴅ!**")
         return
     
     text = "👥 **ᴍʏ ɢʀᴏᴜᴘs**\n\n"
@@ -372,12 +446,10 @@ async def groups_list(client, message):
         status = "✅" if data.get("enabled", True) else "❌"
         text += f"{status} **{data['name']}**\n"
         text += f"   🆔 `{group_id}`\n"
-        text += f"   📅 {data['added_at'][:16]}\n"
         text += "━━━━━━━━━━━━━━━━━━━━━━━\n"
     
     await message.reply_text(text)
 
-# ========== COMMAND: DELETE GROUP ==========
 @app.on_message(filters.command("delgroup") & filters.private)
 async def delete_group(client, message):
     if not is_owner(message.from_user.id):
@@ -391,13 +463,12 @@ async def delete_group(client, message):
         
         group_id = int(parts[1])
         if remove_group(group_id):
-            await message.reply_text(f"✅ **ɢʀᴏᴜᴘ ʀᴇᴍᴏᴠᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ!**")
+            await message.reply_text(f"✅ **ɢʀᴏᴜᴘ ʀᴇᴍᴏᴠᴇᴅ!**")
         else:
             await message.reply_text(f"❌ **ɢʀᴏᴜᴘ ɴᴏᴛ ғᴏᴜɴᴅ!**")
     except:
         await message.reply_text("❌ **ɪɴᴠᴀʟɪᴅ ғᴏʀᴍᴀᴛ!**")
 
-# ========== COMMAND: TOGGLE GROUP ==========
 @app.on_message(filters.command("toggle") & filters.private)
 async def toggle_group_command(client, message):
     if not is_owner(message.from_user.id):
@@ -419,13 +490,12 @@ async def toggle_group_command(client, message):
     except:
         await message.reply_text("❌ **ɪɴᴠᴀʟɪᴅ ғᴏʀᴍᴀᴛ!**")
 
-# ========== COMMAND: ADD VIDEO ==========
 @app.on_message(filters.command("addvideo") & filters.private)
 async def add_video_command(client, message):
     if not is_owner(message.from_user.id):
         return
     
-    status = await message.reply_text("⏳ **ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ᴠɪᴅᴇᴏ...**")
+    status = await message.reply_text("⏳ **ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ...**")
     
     try:
         if message.reply_to_message and message.reply_to_message.video:
@@ -433,8 +503,7 @@ async def add_video_command(client, message):
             video_id = save_video(video_path)
             await status.edit_text(
                 f"✅ **ᴠɪᴅᴇᴏ #`{video_id}` sᴀᴠᴇᴅ!** 🎉\n\n"
-                f"📹 **ᴛᴏᴛᴀʟ:** `{get_video_count()}`\n"
-                f"🆔 **ᴠɪᴅᴇᴏ ɪᴅ:** `{video_id}`"
+                f"📹 **ᴛᴏᴛᴀʟ:** `{get_video_count()}`"
             )
         else:
             await status.edit_text(
@@ -444,7 +513,6 @@ async def add_video_command(client, message):
     except Exception as e:
         await status.edit_text(f"❌ **ᴇʀʀᴏʀ:** {str(e)}")
 
-# ========== COMMAND: VIDEOS LIST ==========
 @app.on_message(filters.command("videos") & filters.private)
 async def list_videos(client, message):
     if not is_owner(message.from_user.id):
@@ -466,7 +534,6 @@ async def list_videos(client, message):
     text += f"\n📹 **ᴛᴏᴛᴀʟ:** `{len(videos)}`"
     await message.reply_text(text)
 
-# ========== COMMAND: DELETE VIDEO ==========
 @app.on_message(filters.command("delvideo") & filters.private)
 async def delete_video_command(client, message):
     if not is_owner(message.from_user.id):
@@ -486,7 +553,6 @@ async def delete_video_command(client, message):
     except:
         await message.reply_text("❌ **ɪɴᴠᴀʟɪᴅ ғᴏʀᴍᴀᴛ!**")
 
-# ========== COMMAND: CLEAR VIDEOS ==========
 @app.on_message(filters.command("clearvideos") & filters.private)
 async def clear_videos_command(client, message):
     if not is_owner(message.from_user.id):
@@ -506,7 +572,6 @@ async def clear_videos_command(client, message):
     
     await message.reply_text(f"🗑️ **ᴀʟʟ {len(videos)} ᴠɪᴅᴇᴏs ᴄʟᴇᴀʀᴇᴅ!**")
 
-# ========== COMMAND: STATS ==========
 @app.on_message(filters.command("stats") & filters.private)
 async def stats_command(client, message):
     if not is_owner(message.from_user.id):
@@ -542,105 +607,6 @@ async def stats_command(client, message):
     
     await message.reply_text(text)
 
-# ========== GROUP MEMBER HANDLER ==========
-async def send_premium_notification(chat_id, user_mention, message_template, event_type):
-    try:
-        time = get_current_time()
-        date = get_current_date()
-        
-        msg_text = message_template.format(
-            user=user_mention,
-            time=time,
-            date=date
-        )
-        
-        # Premium footer
-        emojis = ["🔥", "✨", "💎", "🌟", "🎉", "🚀", "👑", "💫"]
-        footer = random.sample(emojis, 3)
-        msg_text += f"\n\n{footer[0]} **ᴘʀᴇᴍɪᴜᴍ** {footer[1]} **ᴜᴘᴅᴀᴛᴇ** {footer[2]}"
-        
-        # Get unused video
-        video_data = get_unused_video()
-        
-        if video_data and os.path.exists(video_data["path"]):
-            await app.send_video(
-                chat_id=chat_id,
-                video=video_data["path"],
-                caption=msg_text,
-                supports_streaming=True,
-                width=1920,
-                height=1080
-            )
-            logger.info(f"📹 Video #{video_data['id']} sent to {chat_id}")
-        else:
-            await app.send_message(chat_id=chat_id, text=msg_text)
-            logger.info(f"📝 Message sent to {chat_id} (no video)")
-    except Exception as e:
-        logger.error(f"❌ Error: {e}")
-
-@app.on_chat_member_updated()
-async def member_update_handler(client, update: ChatMemberUpdated):
-    try:
-        chat_id = update.chat.id
-        
-        # Check if group is enabled
-        if not is_group_enabled(chat_id):
-            return
-        
-        # Check if bot is added to group (always true if we get update)
-        # No admin check needed!
-        
-        if update.new_chat_member and not update.old_chat_member:
-            user = update.new_chat_member.user
-            mention = f"[{user.first_name}](tg://user?id={user.id})"
-            await send_premium_notification(
-                chat_id, 
-                mention, 
-                random.choice(JOIN_MESSAGES),
-                "JOIN"
-            )
-            logger.info(f"👤 JOIN: {user.first_name} in {chat_id}")
-        
-        elif update.old_chat_member and not update.new_chat_member:
-            user = update.old_chat_member.user
-            mention = f"[{user.first_name}](tg://user?id={user.id})"
-            await send_premium_notification(
-                chat_id, 
-                mention, 
-                random.choice(LEFT_MESSAGES),
-                "LEFT"
-            )
-            logger.info(f"🚶 LEFT: {user.first_name} in {chat_id}")
-        
-        elif update.new_chat_member and update.new_chat_member.status in ["kicked", "restricted"]:
-            user = update.new_chat_member.user
-            mention = f"[{user.first_name}](tg://user?id={user.id})"
-            await send_premium_notification(
-                chat_id, 
-                mention, 
-                random.choice(BAN_MESSAGES),
-                "BAN"
-            )
-            logger.info(f"🚫 BANNED: {user.first_name} in {chat_id}")
-            
-    except Exception as e:
-        logger.error(f"❌ Error in member update: {e}")
-
-# ========== COMMAND: HELP IN GROUP ==========
-@app.on_message(filters.command("ping") & filters.group)
-async def group_ping(client, message):
-    await message.reply_text("🏓 **Pong!** Bot is active!")
-
-# ========== KEEP ALIVE ==========
-async def keep_alive():
-    while True:
-        await asyncio.sleep(300)
-        logger.info("💓 Keep-alive ping")
-        try:
-            await app.get_me()
-        except:
-            pass
-
 # ========== RUN ==========
 if __name__ == "__main__":
     print("\n" + "="*60)
@@ -656,7 +622,6 @@ if __name__ == "__main__":
         with open(GROUPS_DB, "w") as f:
             json.dump({}, f)
     
-    # Create downloads folder
     os.makedirs("downloads", exist_ok=True)
     
     print("📁 Databases created!")
