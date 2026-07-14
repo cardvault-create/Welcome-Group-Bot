@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 # ========== 🔴 APNA DATA DAALO ==========
 API_ID = 35140329
 API_HASH = "011f638e4acadee178c59afffc80193d"
-BOT_TOKEN = "8603632286:AAEK7TKZ-XLXTXUSniwqsHAZ1Fr89RPB1cU"
+BOT_TOKEN = "8603632286:AAHZ0y_rJ7UTZ6jRWCSvej0JjUhVtuiTRpY"
 OWNER_ID = 7614459746
 OWNER_USERNAME = "BESTCHEAT_OWNER"
 
@@ -815,12 +815,14 @@ print("✅ Bot created!")
 def is_owner(user_id):
     return user_id == OWNER_ID
 
-# ========== IS ADMIN OR CREATOR ==========
+# ========== 🔴 FIXED: IS ADMIN OR CREATOR ==========
 async def is_admin_or_creator(chat_id, user_id):
     try:
         member = await app.get_chat_member(chat_id, user_id)
+        logger.info(f"🔍 User {user_id} status: {member.status}")
         return member.status in ["administrator", "creator"]
-    except:
+    except Exception as e:
+        logger.error(f"❌ Admin check error: {e}")
         return False
 
 # ========== CHECK IF USER IN GROUP ==========
