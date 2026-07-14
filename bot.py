@@ -56,10 +56,10 @@ ADMIN_ERROR_MSG = f"""❌{LINE}❌
   ✾ <b>This User Is A Group Admin, You Can't Do Anything!</b> °˳˳˳!!♡🇵🇹
 ❌{LINE}❌"""
 
-REVOKED_ERROR_MSG = f"""❌{LINE}❌
+USER_ERROR_MSG = f"""❌{LINE}❌
   ☆ 
   .•° <b>Hey! You can't use this command!</b> ❗
-  ✾ <b>Only Bot Father Can Restore, You Can't Do Anything!</b> °˳˳˳!!♡🇵🇹
+  ✾ <b>You are not a group admin, You can't do Anything!</b> °˳˳˳!!♡🇵🇹
 ❌{LINE}❌"""
 
 UNAUTHORIZED_MSG = f"""❌{LINE}❌
@@ -815,8 +815,8 @@ print("✅ Bot created!")
 def is_owner(user_id):
     return user_id == OWNER_ID
 
-# ========== IS ADMIN ==========
-async def is_admin(chat_id, user_id):
+# ========== IS ADMIN OR CREATOR ==========
+async def is_admin_or_creator(chat_id, user_id):
     try:
         member = await app.get_chat_member(chat_id, user_id)
         return member.status in ["administrator", "creator"]
@@ -977,7 +977,7 @@ async def service_handler(client, message: Message):
     except Exception as e:
         logger.error(f"❌ Error in service_handler: {e}")
 
-# ========== 🔴 MUTE COMMAND (ADMIN + OWNER) ==========
+# ========== 🔴 MUTE COMMAND (ADMIN + CREATOR + OWNER) ==========
 @app.on_message(filters.group & filters.command("tmkc"))
 async def mute_user(client, message: Message):
     try:
@@ -992,9 +992,9 @@ async def mute_user(client, message: Message):
                 pass
             return
         
-        # 🔴 FIX: Check if user is ADMIN or OWNER
-        if not await is_admin(chat_id, user_id) and not is_owner(user_id):
-            await message.reply_text(REVOKED_ERROR_MSG, reply_markup=get_owner_button())
+        # 🔴 FIX: Check if user is ADMIN, CREATOR, or OWNER
+        if not await is_admin_or_creator(chat_id, user_id) and not is_owner(user_id):
+            await message.reply_text(USER_ERROR_MSG, reply_markup=get_owner_button())
             return
         
         if not message.reply_to_message:
@@ -1014,8 +1014,8 @@ async def mute_user(client, message: Message):
             await message.reply_text(OWNER_ERROR_MSG, reply_markup=get_owner_button())
             return
         
-        # Check if target is ADMIN
-        if await is_admin(chat_id, target_id):
+        # Check if target is ADMIN or CREATOR
+        if await is_admin_or_creator(chat_id, target_id):
             await message.reply_text(ADMIN_ERROR_MSG, reply_markup=get_owner_button())
             return
         
@@ -1091,7 +1091,7 @@ async def mute_user(client, message: Message):
         logger.error(f"❌ Mute error: {e}")
         await message.reply_text(f"❌ **__Error:__** {str(e)}")
 
-# ========== 🔴 UNMUTE COMMAND (ADMIN + OWNER) ==========
+# ========== 🔴 UNMUTE COMMAND (ADMIN + CREATOR + OWNER) ==========
 @app.on_message(filters.group & filters.command("tbur"))
 async def unmute_user(client, message: Message):
     try:
@@ -1106,9 +1106,9 @@ async def unmute_user(client, message: Message):
                 pass
             return
         
-        # 🔴 FIX: Check if user is ADMIN or OWNER
-        if not await is_admin(chat_id, user_id) and not is_owner(user_id):
-            await message.reply_text(REVOKED_ERROR_MSG, reply_markup=get_owner_button())
+        # 🔴 FIX: Check if user is ADMIN, CREATOR, or OWNER
+        if not await is_admin_or_creator(chat_id, user_id) and not is_owner(user_id):
+            await message.reply_text(USER_ERROR_MSG, reply_markup=get_owner_button())
             return
         
         if not message.reply_to_message:
