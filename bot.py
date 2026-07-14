@@ -26,12 +26,13 @@ OWNER_USERNAME = "BESTCHEAT_OWNER"
 VIDEO_DB = "videos.json"
 GROUPS_DB = "groups.json"
 MUTE_DB = "mutes.json"
+REVOKE_DB = "revoke.json"
 
 # ========== TIMEZONE ==========
 IST = pytz.timezone('Asia/Kolkata')
 
 # ========== LINE SIZE ==========
-LINE = "━━━━━━━━━━━━━━"
+LINE = "━━━━━━━━━━━━━━━━━"
 
 # ========== DATABASE FUNCTIONS ==========
 def load_videos():
@@ -172,6 +173,38 @@ def is_muted(group_id, user_id):
         else:
             remove_mute(group_id, user_id)
     return False
+
+# ========== REVOKE DATABASE ==========
+def load_revoke():
+    try:
+        if os.path.exists(REVOKE_DB):
+            with open(REVOKE_DB, "r") as f:
+                return json.load(f)
+    except:
+        pass
+    return {}
+
+def save_revoke(group_id, user_id):
+    revoke = load_revoke()
+    key = f"{group_id}_{user_id}"
+    revoke[key] = True
+    with open(REVOKE_DB, "w") as f:
+        json.dump(revoke, f, indent=2)
+
+def remove_revoke(group_id, user_id):
+    revoke = load_revoke()
+    key = f"{group_id}_{user_id}"
+    if key in revoke:
+        del revoke[key]
+        with open(REVOKE_DB, "w") as f:
+            json.dump(revoke, f, indent=2)
+        return True
+    return False
+
+def is_revoked(group_id, user_id):
+    revoke = load_revoke()
+    key = f"{group_id}_{user_id}"
+    return key in revoke
 
 # ========== TIME FUNCTIONS ==========
 def get_current_time():
@@ -662,6 +695,14 @@ print("✅ Bot created!")
 def is_owner(user_id):
     return user_id == OWNER_ID
 
+# ========== IS ADMIN ==========
+async def is_admin(chat_id, user_id):
+    try:
+        member = await app.get_chat_member(chat_id, user_id)
+        return member.status in ["administrator", "creator"]
+    except:
+        return False
+
 # ========== SEND NOTIFICATION ==========
 async def send_notification(chat_id, user_mention, msg_template, extra=None):
     try:
@@ -693,6 +734,12 @@ async def add_group_from_group(client, message: Message):
     try:
         chat_id = message.chat.id
         chat_name = message.chat.title or f"Group {chat_id}"
+
+        # 🔴 DELETE COMMAND MESSAGE INSTANTLY
+        try:
+            await message.delete()
+        except:
+            pass
         
         groups = load_groups()
         if str(chat_id) in groups:
@@ -737,7 +784,6 @@ async def add_group_from_group(client, message: Message):
         await asyncio.sleep(5)
         try:
             await sent_msg.delete()
-            await message.delete()
         except:
             pass
         
@@ -781,11 +827,13 @@ async def service_handler(client, message: Message):
 @app.on_message(filters.group & filters.command("tmkc"))
 async def mute_user(client, message: Message):
     try:
-        if not is_owner(message.from_user.id):
-            await message.reply_text(f"❌{LINE}❌\n   **__This Command Only For Bot Father!__**\n❌{LINE}❌")
-            return
-        
         chat_id = message.chat.id
+        user_id = message.from_user.id
+        
+        # Check if user is admin or owner
+        if not await is_admin(chat_id, user_id) and not is_owner(user_id):
+            await message.reply_text(f"❌{LINE}❌\n   **__Only Admin & Owner Can Use!__**\n❌{LINE}❌")
+            return
         
         if not message.reply_to_message:
             await message.reply_text(f"❌{LINE}❌\n   **__Reply to a user!__**\n❌{LINE}❌")
@@ -796,14 +844,14 @@ async def mute_user(client, message: Message):
         
         parts = message.text.split()
         if len(parts) < 2:
-            await message.reply_text(f"❌{LINE}❌\n   **__/tmkc @user 1s/1m/1h/1d__**\n❌{LINE}❌")
+            await message.reply_text(f"❌{LINE}❌\n   **__/tmkc @user 1s/1m/1h/1d/1w/30d__**\n❌{LINE}❌")
             return
         
         time_str = parts[1]
         value, unit = parse_time(time_str)
         
         if value is None:
-            await message.reply_text(f"❌{LINE}❌\n   **__Invalid time! Use 1s/1m/1h/1d__**\n❌{LINE}❌")
+            await message.reply_text(f"❌{LINE}❌\n   **__Invalid time! Use 1s/1m/1h/1d/1w/30d__**\n❌{LINE}❌")
             return
         
         # Max limits
@@ -823,6 +871,9 @@ async def mute_user(client, message: Message):
         delta = timedelta(**{f"{unit}s": value})
         until_time = datetime.now() + delta
         until_str = until_time.isoformat()
+        
+        # Remove from revoke if exists
+        remove_revoke(chat_id, target_id)
         
         save_mute(chat_id, target_id, until_str)
         
@@ -867,13 +918,13 @@ async def mute_user(client, message: Message):
             await app.send_message(chat_id, msg_text)
         
         asyncio.create_task(auto_unmute(chat_id, target_id, target.first_name, until_time))
-        logger.info(f"🔇 MUTED: {target.first_name} for {duration}")
+        logger.info(f"🔇 MUTED: {target.first_name} for {duration} by {message.from_user.first_name}")
         
     except Exception as e:
         logger.error(f"❌ Mute error: {e}")
         await message.reply_text(f"❌ **__Error:__** {str(e)}")
 
-# ========== PERMANENT MUTE ==========
+# ========== PERMANENT MUTE (OWNER ONLY) ==========
 @app.on_message(filters.group & filters.command("revokemute"))
 async def permanent_mute(client, message: Message):
     try:
@@ -890,7 +941,11 @@ async def permanent_mute(client, message: Message):
         target = message.reply_to_message.from_user
         target_id = target.id
         
-        save_mute(chat_id, target_id, "permanent")
+        # Remove from normal mute
+        remove_mute(chat_id, target_id)
+        
+        # Save to revoke database
+        save_revoke(chat_id, target_id)
         
         try:
             await app.restrict_chat_member(
@@ -930,13 +985,13 @@ async def permanent_mute(client, message: Message):
         else:
             await app.send_message(chat_id, msg_text)
         
-        logger.info(f"🔇 PERMANENT MUTE: {target.first_name}")
+        logger.info(f"🔇 PERMANENT MUTE: {target.first_name} by {message.from_user.first_name}")
         
     except Exception as e:
         logger.error(f"❌ Permanent mute error: {e}")
         await message.reply_text(f"❌ **__Error:__** {str(e)}")
 
-# ========== UNMUTE ==========
+# ========== UNMUTE (OWNER ONLY) ==========
 @app.on_message(filters.group & filters.command("unrevokemute"))
 async def unmute_user(client, message: Message):
     try:
@@ -953,9 +1008,13 @@ async def unmute_user(client, message: Message):
         target = message.reply_to_message.from_user
         target_id = target.id
         
-        if not remove_mute(chat_id, target_id):
-            await message.reply_text(f"❌{LINE}❌\n   **__User is not muted!__**\n❌{LINE}❌")
+        # Remove from revoke
+        if not remove_revoke(chat_id, target_id):
+            await message.reply_text(f"❌{LINE}❌\n   **__User is not permanently muted!__**\n❌{LINE}❌")
             return
+        
+        # Remove from normal mute too
+        remove_mute(chat_id, target_id)
         
         try:
             await app.restrict_chat_member(
@@ -991,7 +1050,7 @@ async def unmute_user(client, message: Message):
         else:
             await app.send_message(chat_id, msg_text)
         
-        logger.info(f"🔊 UNMUTED: {target.first_name}")
+        logger.info(f"🔊 UNMUTED: {target.first_name} by {message.from_user.first_name}")
         
     except Exception as e:
         logger.error(f"❌ Unmute error: {e}")
@@ -1005,6 +1064,10 @@ async def auto_unmute(chat_id, user_id, user_name, until_time):
         
         if wait_seconds > 0:
             await asyncio.sleep(wait_seconds)
+        
+        # Check if not revoked
+        if is_revoked(chat_id, user_id):
+            return
         
         if is_muted(chat_id, user_id):
             remove_mute(chat_id, user_id)
@@ -1047,19 +1110,26 @@ async def auto_unmute(chat_id, user_id, user_name, until_time):
     except Exception as e:
         logger.error(f"❌ Auto unmute error: {e}")
 
-# ========== DELETE MUTED MESSAGES ==========
+# ========== DELETE REVOKED/MUTED USER MESSAGES ==========
 @app.on_message(filters.group & filters.text)
-async def delete_muted_messages(client, message: Message):
+async def delete_revoked_messages(client, message: Message):
     try:
         chat_id = message.chat.id
         user_id = message.from_user.id
         
+        # Check if user is revoked (permanent mute)
+        if is_revoked(chat_id, user_id):
+            await message.delete()
+            logger.info(f"🗑️ Deleted message from revoked user: {message.from_user.first_name}")
+            return
+        
+        # Check if user is muted
         if is_muted(chat_id, user_id):
             await message.delete()
             logger.info(f"🗑️ Deleted message from muted user: {message.from_user.first_name}")
             
     except Exception as e:
-        logger.error(f"❌ Delete muted message error: {e}")
+        logger.error(f"❌ Delete message error: {e}")
 
 # ========== START COMMAND ==========
 @app.on_message(filters.command("start") & filters.private)
@@ -1287,7 +1357,7 @@ if __name__ == "__main__":
     print("🔇 MUTE SYSTEM ACTIVE")
     print("="*40 + "\n")
     
-    for db in [VIDEO_DB, GROUPS_DB, MUTE_DB]:
+    for db in [VIDEO_DB, GROUPS_DB, MUTE_DB, REVOKE_DB]:
         if not os.path.exists(db):
             with open(db, "w") as f:
                 json.dump({} if db != VIDEO_DB else [], f)
