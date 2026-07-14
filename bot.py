@@ -32,7 +32,7 @@ REVOKE_DB = "revoke.json"
 IST = pytz.timezone('Asia/Kolkata')
 
 # ========== LINE SIZES ==========
-LINE = "━━━━━━━━━━━━━━"
+LINE = "━━━━━━━━━━━━━━━━━"
 LINE_BIG = "━━━━━━━━━━━━━━━━━━━━━━━"
 
 # ========== DATABASE FUNCTIONS ==========
