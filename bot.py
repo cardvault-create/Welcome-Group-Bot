@@ -32,7 +32,7 @@ REVOKE_DB = "revoke.json"
 IST = pytz.timezone('Asia/Kolkata')
 
 # ========== LINE SIZES ==========
-LINE = "━━━━━━━━━━━━━━━━━━"
+LINE = "━━━━━━━━━━━━━━━━━━━"
 LINE_BIG = "━━━━━━━━━━━━━━━━━━━━━━"
 
 # ========== USED VIDEOS TRACKING ==========
@@ -283,16 +283,28 @@ def format_duration(value, unit):
         return f"{value} week{'s' if value > 1 else ''}"
     return f"{value}{unit}"
 
+def format_time_remaining(seconds):
+    if seconds < 60:
+        return f"{int(seconds)} seconds"
+    elif seconds < 3600:
+        return f"{int(seconds/60)} minutes"
+    elif seconds < 86400:
+        return f"{int(seconds/3600)} hours"
+    elif seconds < 604800:
+        return f"{int(seconds/86400)} days"
+    else:
+        return f"{int(seconds/604800)} weeks"
+
 # ========== SHORT MESSAGES ==========
 JOIN_MSGS = [
     f"""🔥{LINE}🔥
    🐦‍🔥 {{user}} 🐦‍🔥
-   𝐏𝐇𝐎𝐄𝐍𝐈𝐗 𝐑𝐈𝐒𝐄𝐒!
+   **__𝐏𝐇𝐎𝐄𝐍𝐈𝐗 𝐑𝐈𝐒𝐄𝐒!__**
 🔥{LINE}🔥
 
-𝐑𝐢𝐬𝐢𝐧𝐠 𝐟𝐫𝐨𝐦 𝐚𝐬𝐡! 🔥
-𝐘𝐨𝐮'𝐫𝐞 𝐮𝐧𝐬𝐭𝐨𝐩𝐩𝐚𝐛𝐥𝐞! 💪
-𝐁𝐨𝐫𝐧 𝐭𝐨 𝐰𝐢𝐧! 🏆
+**__𝐑𝐢𝐬𝐢𝐧𝐠 𝐟𝐫𝐨𝐦 𝐚𝐬𝐡!__** 🔥
+**__𝐘𝐨𝐮'𝐫𝐞 𝐮𝐧𝐬𝐭𝐨𝐩𝐩𝐚𝐛𝐥𝐞!__** 💪
+**__𝐁𝐨𝐫𝐧 𝐭𝐨 𝐰𝐢𝐧!__** 🏆
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -300,12 +312,12 @@ JOIN_MSGS = [
 
     f"""👑{LINE}👑
    🦁 {{user}} 🦁
-   𝐊𝐈𝐍𝐆 𝐖𝐄𝐋𝐂𝐎𝐌𝐄!
+   **__𝐊𝐈𝐍𝐆 𝐖𝐄𝐋𝐂𝐎𝐌𝐄!__**
 👑{LINE}👑
 
-𝐓𝐡𝐞 𝐤𝐢𝐧𝐠 𝐢𝐬 𝐡𝐞𝐫𝐞! 👑
-𝐘𝐨𝐮'𝐫𝐞 𝐭𝐡𝐞 𝐫𝐮𝐥𝐞𝐫! ⚔️
-𝐋𝐞𝐭'𝐬 𝐜𝐨𝐧𝐪𝐮𝐞𝐫! 🏰
+**__𝐓𝐡𝐞 𝐤𝐢𝐧𝐠 𝐢𝐬 𝐡𝐞𝐫𝐞!__** 👑
+**__𝐘𝐨𝐮'𝐫𝐞 𝐭𝐡𝐞 𝐫𝐮𝐥𝐞𝐫!__** ⚔️
+**__𝐋𝐞𝐭'𝐬 𝐜𝐨𝐧𝐪𝐮𝐞𝐫!__** 🏰
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -313,12 +325,12 @@ JOIN_MSGS = [
 
     f"""🐉{LINE}🐉
    ⚡ {{user}} ⚡
-   𝐃𝐑𝐀𝐆𝐎𝐍 𝐀𝐑𝐑𝐈𝐕𝐄𝐃!
+   **__𝐃𝐑𝐀𝐆𝐎𝐍 𝐀𝐑𝐑𝐈𝐕𝐄𝐃!__**
 🐉{LINE}🐉
 
-𝐓𝐡𝐞 𝐝𝐫𝐚𝐠𝐨𝐧 𝐢𝐬 𝐡𝐞𝐫𝐞! 🐲
-𝐅𝐢𝐫𝐞 𝐢𝐧 𝐭𝐡𝐞 𝐬𝐨𝐮𝐥! 🔥
-𝐔𝐧𝐥𝐞𝐚𝐬𝐡 𝐩𝐨𝐰𝐞𝐫! ⚡
+**__𝐓𝐡𝐞 𝐝𝐫𝐚𝐠𝐨𝐧 𝐢𝐬 𝐡𝐞𝐫𝐞!__** 🐲
+**__𝐅𝐢𝐫𝐞 𝐢𝐧 𝐭𝐡𝐞 𝐬𝐨𝐮𝐥!__** 🔥
+**__𝐔𝐧𝐥𝐞𝐚𝐬𝐡 𝐩𝐨𝐰𝐞𝐫!__** ⚡
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -326,12 +338,12 @@ JOIN_MSGS = [
 
     f"""🐺{LINE}🐺
    🌙 {{user}} 🌙
-   𝐋𝐄𝐆𝐄𝐍𝐃 𝐉𝐎𝐈𝐍𝐒!
+   **__𝐋𝐄𝐆𝐄𝐍𝐃 𝐉𝐎𝐈𝐍𝐒!__**
 🐺{LINE}🐺
 
-𝐖𝐨𝐥𝐟 𝐡𝐚𝐬 𝐚𝐫𝐫𝐢𝐯𝐞𝐝! 🌕
-𝐋𝐞𝐚𝐝𝐞𝐫 𝐨𝐟 𝐩𝐚𝐜𝐤! 🐾
-𝐋𝐞𝐭'𝐬 𝐡𝐨𝐰𝐥! 🌙
+**__𝐖𝐨𝐥𝐟 𝐡𝐚𝐬 𝐚𝐫𝐫𝐢𝐯𝐞𝐝!__** 🌕
+**__𝐋𝐞𝐚𝐝𝐞𝐫 𝐨𝐟 𝐩𝐚𝐜𝐤!__** 🐾
+**__𝐋𝐞𝐭'𝐬 𝐡𝐨𝐰𝐥!__** 🌙
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -339,12 +351,12 @@ JOIN_MSGS = [
 
     f"""💪{LINE}💪
    🦍 {{user}} 🦍
-   𝐓𝐈𝐓𝐀𝐍 𝐀𝐑𝐑𝐈𝐕𝐄𝐃!
+   **__𝐓𝐈𝐓𝐀𝐍 𝐀𝐑𝐑𝐈𝐕𝐄𝐃!__**
 💪{LINE}💪
 
-𝐓𝐢𝐭𝐚𝐧 𝐢𝐬 𝐡𝐞𝐫𝐞! 🏔️
-𝐒𝐭𝐫𝐞𝐧𝐠𝐭𝐡 𝐮𝐧𝐥𝐞𝐚𝐬𝐡! ⚡
-𝐋𝐞𝐭'𝐬 𝐝𝐨𝐦𝐢𝐧𝐚𝐭𝐞! 🔥
+**__𝐓𝐢𝐭𝐚𝐧 𝐢𝐬 𝐡𝐞𝐫𝐞!__** 🏔️
+**__𝐒𝐭𝐫𝐞𝐧𝐠𝐭𝐡 𝐮𝐧𝐥𝐞𝐚𝐬𝐡!__** ⚡
+**__𝐋𝐞𝐭'𝐬 𝐝𝐨𝐦𝐢𝐧𝐚𝐭𝐞!__** 🔥
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -352,12 +364,12 @@ JOIN_MSGS = [
 
     f"""🌌{LINE}🌌
    🚀 {{user}} 🚀
-   𝐆𝐀𝐋𝐀𝐗𝐘 𝐉𝐎𝐈𝐍!
+   **__𝐆𝐀𝐋𝐀𝐗𝐘 𝐉𝐎𝐈𝐍!__**
 🌌{LINE}🌌
 
-𝐀 𝐬𝐭𝐚𝐫 𝐢𝐬 𝐛𝐨𝐫𝐧! 🌟
-𝐁𝐞𝐲𝐨𝐧𝐝 𝐭𝐡𝐢𝐬 𝐰𝐨𝐫𝐥𝐝! 👽
-𝐂𝐨𝐬𝐦𝐨𝐬 𝐰𝐚𝐢𝐭𝐬! 🌠
+**__𝐀 𝐬𝐭𝐚𝐫 𝐢𝐬 𝐛𝐨𝐫𝐧!__** 🌟
+**__𝐁𝐞𝐲𝐨𝐧𝐝 𝐭𝐡𝐢𝐬 𝐰𝐨𝐫𝐥𝐝!__** 👽
+**__𝐂𝐨𝐬𝐦𝐨𝐬 𝐰𝐚𝐢𝐭𝐬!__** 🌠
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -365,12 +377,12 @@ JOIN_MSGS = [
 
     f"""🏯{LINE}🏯
    🐯 {{user}} 🐯
-   𝐄𝐌𝐏𝐄𝐑𝐎𝐑 𝐖𝐄𝐋𝐂𝐎𝐌𝐄!
+   **__𝐄𝐌𝐏𝐄𝐑𝐎𝐑 𝐖𝐄𝐋𝐂𝐎𝐌𝐄!__**
 🏯{LINE}🏯
 
-𝐄𝐦𝐩𝐞𝐫𝐨𝐫 𝐚𝐫𝐫𝐢𝐯𝐞𝐝! 👑
-𝐑𝐞𝐬𝐩𝐞𝐜𝐭 𝐭𝐡𝐞 𝐜𝐫𝐨𝐰𝐧! ⚜️
-𝐋𝐞𝐠𝐞𝐧𝐝 𝐛𝐞𝐠𝐢𝐧𝐬! 📜
+**__𝐄𝐦𝐩𝐞𝐫𝐨𝐫 𝐚𝐫𝐫𝐢𝐯𝐞𝐝!__** 👑
+**__𝐑𝐞𝐬𝐩𝐞𝐜𝐭 𝐭𝐡𝐞 𝐜𝐫𝐨𝐰𝐧!__** ⚜️
+**__𝐋𝐞𝐠𝐞𝐧𝐝 𝐛𝐞𝐠𝐢𝐧𝐬!__** 📜
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -378,12 +390,12 @@ JOIN_MSGS = [
 
     f"""🦄{LINE}🦄
    ✨ {{user}} ✨
-   𝐌𝐀𝐆𝐈𝐂 𝐉𝐎𝐈𝐍!
+   **__𝐌𝐀𝐆𝐈𝐂 𝐉𝐎𝐈𝐍!__**
 🦄{LINE}🦄
 
-𝐔𝐧𝐢𝐜𝐨𝐫𝐧 𝐢𝐬 𝐡𝐞𝐫𝐞! 🦄
-𝐌𝐚𝐠𝐢𝐜 𝐢𝐧 𝐚𝐢𝐫! ✨
-𝐎𝐧𝐞 𝐨𝐟 𝐚 𝐤𝐢𝐧𝐝! 💫
+**__𝐔𝐧𝐢𝐜𝐨𝐫𝐧 𝐢𝐬 𝐡𝐞𝐫𝐞!__** 🦄
+**__𝐌𝐚𝐠𝐢𝐜 𝐢𝐧 𝐚𝐢𝐫!__** ✨
+**__𝐎𝐧𝐞 𝐨𝐟 𝐚 𝐤𝐢𝐧𝐝!__** 💫
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -391,12 +403,12 @@ JOIN_MSGS = [
 
     f"""🦈{LINE}🦈
    ⚓ {{user}} ⚓
-   𝐄𝐋𝐈𝐓𝐄 𝐀𝐑𝐑𝐈𝐕𝐄𝐃!
+   **__𝐄𝐋𝐈𝐓𝐄 𝐀𝐑𝐑𝐈𝐕𝐄𝐃!__**
 🦈{LINE}🦈
 
-𝐒𝐡𝐚𝐫𝐤 𝐢𝐬 𝐡𝐞𝐫𝐞! 🌊
-𝐑𝐮𝐥𝐞 𝐭𝐡𝐞 𝐝𝐞𝐞𝐩! 🏊
-𝐔𝐧𝐬𝐭𝐨𝐩𝐩𝐚𝐛𝐥𝐞! 💪
+**__𝐒𝐡𝐚𝐫𝐤 𝐢𝐬 𝐡𝐞𝐫𝐞!__** 🌊
+**__𝐑𝐮𝐥𝐞 𝐭𝐡𝐞 𝐝𝐞𝐞𝐩!__** 🏊
+**__𝐔𝐧𝐬𝐭𝐨𝐩𝐩𝐚𝐛𝐥𝐞!__** 💪
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -404,12 +416,12 @@ JOIN_MSGS = [
 
     f"""🦅{LINE}🦅
    ☀️ {{user}} ☀️
-   𝐑𝐎𝐘𝐀𝐋 𝐅𝐋𝐘!
+   **__𝐑𝐎𝐘𝐀𝐋 𝐅𝐋𝐘!__**
 🦅{LINE}🦅
 
-𝐄𝐚𝐠𝐥𝐞 𝐡𝐚𝐬 𝐟𝐥𝐨𝐰𝐧! 🦅
-𝐅𝐥𝐲 𝐡𝐢𝐠𝐡! 𝐃𝐫𝐞𝐚𝐦 𝐛𝐢𝐠! ☀️
-𝐒𝐤𝐲 𝐢𝐬 𝐭𝐡𝐞 𝐥𝐢𝐦𝐢𝐭! 🌤️
+**__𝐄𝐚𝐠𝐥𝐞 𝐡𝐚𝐬 𝐟𝐥𝐨𝐰𝐧!__** 🦅
+**__𝐅𝐥𝐲 𝐡𝐢𝐠𝐡! 𝐃𝐫𝐞𝐚𝐦 𝐛𝐢𝐠!__** ☀️
+**__𝐒𝐤𝐲 𝐢𝐬 𝐭𝐡𝐞 𝐥𝐢𝐦𝐢𝐭!__** 🌤️
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -419,12 +431,12 @@ JOIN_MSGS = [
 BAN_MSGS = [
     f"""⚖️{LINE}⚖️
    ⛔️ {{user}} ⛔️
-   𝐉𝐔𝐒𝐓𝐈𝐂𝐄 𝐒𝐄𝐑𝐕𝐄𝐃!
+   **__𝐉𝐔𝐒𝐓𝐈𝐂𝐄 𝐒𝐄𝐑𝐕𝐄𝐃!__**
 ⚖️{LINE}⚖️
 
-𝐑𝐮𝐥𝐞𝐬 𝐰𝐞𝐫𝐞 𝐛𝐫𝐨𝐤𝐞𝐧! 🚨
-𝐀𝐜𝐭𝐢𝐨𝐧 𝐰𝐚𝐬 𝐧𝐞𝐞𝐝𝐞𝐝! ⚡
-𝐆𝐫𝐨𝐮𝐩 𝐢𝐬 𝐬𝐚𝐟𝐞! 🛡️
+**__𝐑𝐮𝐥𝐞𝐬 𝐰𝐞𝐫𝐞 𝐛𝐫𝐨𝐤𝐞𝐧!__** 🚨
+**__𝐀𝐜𝐭𝐢𝐨𝐧 𝐰𝐚𝐬 𝐧𝐞𝐞𝐝𝐞𝐝!__** ⚡
+**__𝐆𝐫𝐨𝐮𝐩 𝐢𝐬 𝐬𝐚𝐟𝐞!__** 🛡️
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -432,12 +444,12 @@ BAN_MSGS = [
 
     f"""🔨{LINE}🔨
    🚷 {{user}} 🚷
-   𝐁𝐀𝐍 𝐇𝐀𝐌𝐌𝐄𝐑!
+   **__𝐁𝐀𝐍 𝐇𝐀𝐌𝐌𝐄𝐑!__**
 🔨{LINE}🔨
 
-𝐎𝐮𝐭 𝐨𝐟 𝐠𝐚𝐦𝐞! ⚽
-𝐍𝐨 𝐭𝐨𝐥𝐞𝐫𝐚𝐧𝐜𝐞! ❌
-𝐑𝐮𝐥𝐞𝐬 𝐚𝐫𝐞 𝐫𝐮𝐥𝐞𝐬! 📜
+**__𝐎𝐮𝐭 𝐨𝐟 𝐠𝐚𝐦𝐞!__** ⚽
+**__𝐍𝐨 𝐭𝐨𝐥𝐞𝐫𝐚𝐧𝐜𝐞!__** ❌
+**__𝐑𝐮𝐥𝐞𝐬 𝐚𝐫𝐞 𝐫𝐮𝐥𝐞𝐬!__** 📜
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -445,12 +457,12 @@ BAN_MSGS = [
 
     f"""🚀{LINE}🚀
    💢 {{user}} 💢
-   𝐄𝐉𝐄𝐂𝐓𝐄𝐃!
+   **__𝐄𝐉𝐄𝐂𝐓𝐄𝐃!__**
 🚀{LINE}🚀
 
-𝐘𝐨𝐮'𝐫𝐞 𝐨𝐮𝐭! 🌌
-𝐆𝐫𝐨𝐮𝐩 𝐦𝐨𝐯𝐞𝐬 𝐨𝐧! 🚶
-𝐆𝐨𝐨𝐝𝐛𝐲𝐞! 👋
+**__𝐘𝐨𝐮'𝐫𝐞 𝐨𝐮𝐭!__** 🌌
+**__𝐆𝐫𝐨𝐮𝐩 𝐦𝐨𝐯𝐞𝐬 𝐨𝐧!__** 🚶
+**__𝐆𝐨𝐨𝐝𝐛𝐲𝐞!__** 👋
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -458,12 +470,12 @@ BAN_MSGS = [
 
     f"""🔒{LINE}🔒
    🚷 {{user}} 🚷
-   𝐒𝐄𝐂𝐔𝐑𝐈𝐓𝐘 𝐋𝐎𝐂𝐊!
+   **__𝐒𝐄𝐂𝐔𝐑𝐈𝐓𝐘 𝐋𝐎𝐂𝐊!__**
 🔒{LINE}🔒
 
-𝐀𝐜𝐜𝐞𝐬𝐬 𝐝𝐞𝐧𝐢𝐞𝐝! 🚫
-𝐒𝐞𝐜𝐮𝐫𝐢𝐭𝐲 𝐚𝐜𝐭𝐢𝐯𝐚𝐭𝐞𝐝! 🛡️
-𝐒𝐚𝐟𝐞 𝐬𝐩𝐚𝐜𝐞! ✨
+**__𝐀𝐜𝐜𝐞𝐬𝐬 𝐝𝐞𝐧𝐢𝐞𝐝!__** 🚫
+**__𝐒𝐞𝐜𝐮𝐫𝐢𝐭𝐲 𝐚𝐜𝐭𝐢𝐯𝐚𝐭𝐞𝐝!__** 🛡️
+**__𝐒𝐚𝐟𝐞 𝐬𝐩𝐚𝐜𝐞!__** ✨
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -471,12 +483,12 @@ BAN_MSGS = [
 
     f"""🚫{LINE}🚫
    ⛔️ {{user}} ⛔️
-   𝐎𝐔𝐓𝐂𝐀𝐒𝐓!
+   **__𝐎𝐔𝐓𝐂𝐀𝐒𝐓!__**
 🚫{LINE}🚫
 
-𝐍𝐨 𝐦𝐨𝐫𝐞 𝐜𝐡𝐚𝐧𝐜𝐞𝐬! ❌
-𝐖𝐚𝐫𝐧𝐢𝐧𝐠𝐬 𝐢𝐠𝐧𝐨𝐫𝐞𝐝! 👀
-𝐓𝐢𝐦𝐞 𝐭𝐨 𝐠𝐨! 🚪
+**__𝐍𝐨 𝐦𝐨𝐫𝐞 𝐜𝐡𝐚𝐧𝐜𝐞𝐬!__** ❌
+**__𝐖𝐚𝐫𝐧𝐢𝐧𝐠𝐬 𝐢𝐠𝐧𝐨𝐫𝐞𝐝!__** 👀
+**__𝐓𝐢𝐦𝐞 𝐭𝐨 𝐠𝐨!__** 🚪
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -484,12 +496,12 @@ BAN_MSGS = [
 
     f"""💀{LINE}💀
    ⚡ {{user}} ⚡
-   𝐓𝐄𝐑𝐌𝐈𝐍𝐀𝐓𝐄𝐃!
+   **__𝐓𝐄𝐑𝐌𝐈𝐍𝐀𝐓𝐄𝐃!__**
 💀{LINE}💀
 
-𝐆𝐚𝐦𝐞 𝐨𝐯𝐞𝐫! 🎮
-𝐍𝐨 𝐫𝐞𝐭𝐮𝐫𝐧! 🚫
-𝐓𝐡𝐞 𝐞𝐧𝐝! 💥
+**__𝐆𝐚𝐦𝐞 𝐨𝐯𝐞𝐫!__** 🎮
+**__𝐍𝐨 𝐫𝐞𝐭𝐮𝐫𝐧!__** 🚫
+**__𝐓𝐡𝐞 𝐞𝐧𝐝!__** 💥
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -497,12 +509,12 @@ BAN_MSGS = [
 
     f"""🗡️{LINE}🗡️
    💢 {{user}} 💢
-   𝐁𝐀𝐍𝐈𝐒𝐇𝐄𝐃!
+   **__𝐁𝐀𝐍𝐈𝐒𝐇𝐄𝐃!__**
 🗡️{LINE}🗡️
 
-𝐅𝐨𝐫𝐞𝐯𝐞𝐫 𝐠𝐨𝐧𝐞! 🌅
-𝐑𝐮𝐥𝐞𝐬 𝐰𝐞𝐫𝐞 𝐜𝐥𝐞𝐚𝐫! 📋
-𝐆𝐨𝐨𝐝𝐛𝐲𝐞! 👋
+**__𝐅𝐨𝐫𝐞𝐯𝐞𝐫 𝐠𝐨𝐧𝐞!__** 🌅
+**__𝐑𝐮𝐥𝐞𝐬 𝐰𝐞𝐫𝐞 𝐜𝐥𝐞𝐚𝐫!__** 📋
+**__𝐆𝐨𝐨𝐝𝐛𝐲𝐞!__** 👋
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -510,12 +522,12 @@ BAN_MSGS = [
 
     f"""🔐{LINE}🔐
    🚷 {{user}} 🚷
-   𝐁𝐋𝐎𝐂𝐊𝐄𝐃!
+   **__𝐁𝐋𝐎𝐂𝐊𝐄𝐃!__**
 🔐{LINE}🔐
 
-𝐍𝐨 𝐞𝐧𝐭𝐫𝐲! 🚪
-𝐏𝐞𝐫𝐦𝐚𝐧𝐞𝐧𝐭 𝐚𝐜𝐭𝐢𝐨𝐧! ⚖️
-𝐌𝐨𝐯𝐞 𝐨𝐧! 🚶
+**__𝐍𝐨 𝐞𝐧𝐭𝐫𝐲!__** 🚪
+**__𝐏𝐞𝐫𝐦𝐚𝐧𝐞𝐧𝐭 𝐚𝐜𝐭𝐢𝐨𝐧!__** ⚖️
+**__𝐌𝐨𝐯𝐞 𝐨𝐧!__** 🚶
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -523,12 +535,12 @@ BAN_MSGS = [
 
     f"""🎯{LINE}🎯
    ⛔️ {{user}} ⛔️
-   𝐄𝐗𝐏𝐄𝐋𝐋𝐄𝐃!
+   **__𝐄𝐗𝐏𝐄𝐋𝐋𝐄𝐃!__**
 🎯{LINE}🎯
 
-𝐓𝐚𝐫𝐠𝐞𝐭 𝐫𝐞𝐦𝐨𝐯𝐞𝐝! 🎯
-𝐍𝐨 𝐦𝐞𝐫𝐜𝐲! ❌
-𝐑𝐮𝐥𝐞𝐬 𝐰𝐢𝐧! ⚔️
+**__𝐓𝐚𝐫𝐠𝐞𝐭 𝐫𝐞𝐦𝐨𝐯𝐞𝐝!__** 🎯
+**__𝐍𝐨 𝐦𝐞𝐫𝐜𝐲!__** ❌
+**__𝐑𝐮𝐥𝐞𝐬 𝐰𝐢𝐧!__** ⚔️
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -536,12 +548,12 @@ BAN_MSGS = [
 
     f"""💥{LINE}💥
    💢 {{user}} 💢
-   𝐔𝐋𝐓𝐈𝐌𝐀𝐓𝐄 𝐁𝐀𝐍!
+   **__𝐔𝐋𝐓𝐈𝐌𝐀𝐓𝐄 𝐁𝐀𝐍!__**
 💥{LINE}💥
 
-𝐅𝐢𝐧𝐚𝐥 𝐬𝐭𝐫𝐢𝐤𝐞! ⚡
-𝐍𝐨 𝐜𝐨𝐦𝐢𝐧𝐠 𝐛𝐚𝐜𝐤! 🚫
-𝐈𝐭'𝐬 𝐨𝐯𝐞𝐫! 🎬
+**__𝐅𝐢𝐧𝐚𝐥 𝐬𝐭𝐫𝐢𝐤𝐞!__** ⚡
+**__𝐍𝐨 𝐜𝐨𝐦𝐢𝐧𝐠 𝐛𝐚𝐜𝐤!__** 🚫
+**__𝐈𝐭'𝐬 𝐨𝐯𝐞𝐫!__** 🎬
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -551,12 +563,12 @@ BAN_MSGS = [
 LEFT_MSGS = [
     f"""👋{LINE}👋
    💔 {{user}} 💔
-   𝐆𝐎𝐎𝐃𝐁𝐘𝐄!
+   **__𝐆𝐎𝐎𝐃𝐁𝐘𝐄!__**
 👋{LINE}👋
 
-𝐖𝐞'𝐥𝐥 𝐦𝐢𝐬𝐬 𝐲𝐨𝐮! 🥺
-𝐓𝐚𝐤𝐞 𝐜𝐚𝐫𝐞! 🌈
-𝐇𝐨𝐩𝐞 𝐭𝐨 𝐬𝐞𝐞 𝐚𝐠𝐚𝐢𝐧! 🌟
+**__𝐖𝐞'𝐥𝐥 𝐦𝐢𝐬𝐬 𝐲𝐨𝐮!__** 🥺
+**__𝐓𝐚𝐤𝐞 𝐜𝐚𝐫𝐞!__** 🌈
+**__𝐇𝐨𝐩𝐞 𝐭𝐨 𝐬𝐞𝐞 𝐚𝐠𝐚𝐢𝐧!__** 🌟
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -564,12 +576,12 @@ LEFT_MSGS = [
 
     f"""🚶{LINE}🚶
    🌅 {{user}} 🌅
-   𝐃𝐄𝐏𝐀𝐑𝐓𝐔𝐑𝐄!
+   **__𝐃𝐄𝐏𝐀𝐑𝐓𝐔𝐑𝐄!__**
 🚶{LINE}🚶
 
-𝐖𝐚𝐥𝐤𝐢𝐧𝐠 𝐚𝐰𝐚𝐲! 🚶
-𝐓𝐡𝐞 𝐬𝐮𝐧 𝐬𝐞𝐭𝐬! 🌅
-𝐆𝐨𝐨𝐝𝐛𝐲𝐞! 👋
+**__𝐖𝐚𝐥𝐤𝐢𝐧𝐠 𝐚𝐰𝐚𝐲!__** 🚶
+**__𝐓𝐡𝐞 𝐬𝐮𝐧 𝐬𝐞𝐭𝐬!__** 🌅
+**__𝐆𝐨𝐨𝐝𝐛𝐲𝐞!__** 👋
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -577,12 +589,12 @@ LEFT_MSGS = [
 
     f"""🕊️{LINE}🕊️
    💫 {{user}} 💫
-   𝐋𝐎𝐒𝐓 𝐒𝐎𝐔𝐋!
+   **__𝐋𝐎𝐒𝐓 𝐒𝐎𝐔𝐋!__**
 🕊️{LINE}🕊️
 
-𝐅𝐥𝐲 𝐡𝐢𝐠𝐡! 🕊️
-𝐅𝐢𝐧𝐝 𝐲𝐨𝐮𝐫 𝐰𝐚𝐲! 🌟
-𝐘𝐨𝐮'𝐥𝐥 𝐛𝐞 𝐦𝐢𝐬𝐬𝐞𝐝! 💔
+**__𝐅𝐥𝐲 𝐡𝐢𝐠𝐡!__** 🕊️
+**__𝐅𝐢𝐧𝐝 𝐲𝐨𝐮𝐫 𝐰𝐚𝐲!__** 🌟
+**__𝐘𝐨𝐮'𝐥𝐥 𝐛𝐞 𝐦𝐢𝐬𝐬𝐞𝐝!__** 💔
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -590,12 +602,12 @@ LEFT_MSGS = [
 
     f"""🌊{LINE}🌊
    🚣 {{user}} 🚣
-   𝐌𝐎𝐕𝐈𝐍𝐆 𝐎𝐍!
+   **__𝐌𝐎𝐕𝐈𝐍𝐆 𝐎𝐍!__**
 🌊{LINE}🌊
 
-𝐒𝐚𝐢𝐥𝐢𝐧𝐠 𝐚𝐰𝐚𝐲! ⛵
-𝐅𝐢𝐧𝐝 𝐩𝐞𝐚𝐜𝐞! 🌅
-𝐓𝐡𝐞 𝐬𝐞𝐚 𝐰𝐚𝐢𝐭𝐬! 🌊
+**__𝐒𝐚𝐢𝐥𝐢𝐧𝐠 𝐚𝐰𝐚𝐲!__** ⛵
+**__𝐅𝐢𝐧𝐝 𝐩𝐞𝐚𝐜𝐞!__** 🌅
+**__𝐓𝐡𝐞 𝐬𝐞𝐚 𝐰𝐚𝐢𝐭𝐬!__** 🌊
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -603,12 +615,12 @@ LEFT_MSGS = [
 
     f"""✌️{LINE}✌️
    ☮️ {{user}} ☮️
-   𝐏𝐄𝐀𝐂𝐄 𝐎𝐔𝐓!
+   **__𝐏𝐄𝐀𝐂𝐄 𝐎𝐔𝐓!__**
 ✌️{LINE}✌️
 
-𝐒𝐩𝐫𝐞𝐚𝐝 𝐥𝐨𝐯𝐞! ❤️
-𝐅𝐢𝐧𝐝 𝐣𝐨𝐲! 😊
-𝐓𝐚𝐤𝐞 𝐜𝐚𝐫𝐞! ✌️
+**__𝐒𝐩𝐫𝐞𝐚𝐝 𝐥𝐨𝐯𝐞!__** ❤️
+**__𝐅𝐢𝐧𝐝 𝐣𝐨𝐲!__** 😊
+**__𝐓𝐚𝐤𝐞 𝐜𝐚𝐫𝐞!__** ✌️
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -616,12 +628,12 @@ LEFT_MSGS = [
 
     f"""🌹{LINE}🌹
    🥀 {{user}} 🥀
-   𝐅𝐀𝐑𝐄𝐖𝐄𝐋𝐋!
+   **__𝐅𝐀𝐑𝐄𝐖𝐄𝐋𝐋!__**
 🌹{LINE}🌹
 
-𝐀 𝐫𝐨𝐬𝐞 𝐡𝐚𝐬 𝐟𝐚𝐥𝐥𝐞𝐧! 🌹
-𝐋𝐞𝐠𝐞𝐧𝐝𝐬 𝐫𝐞𝐦𝐚𝐢𝐧! 📜
-𝐒𝐞𝐞 𝐲𝐨𝐮 𝐬𝐨𝐨𝐧! 👋
+**__𝐀 𝐫𝐨𝐬𝐞 𝐡𝐚𝐬 𝐟𝐚𝐥𝐥𝐞𝐧!__** 🌹
+**__𝐋𝐞𝐠𝐞𝐧𝐝𝐬 𝐫𝐞𝐦𝐚𝐢𝐧!__** 📜
+**__𝐒𝐞𝐞 𝐲𝐨𝐮 𝐬𝐨𝐨𝐧!__** 👋
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -629,12 +641,12 @@ LEFT_MSGS = [
 
     f"""🌙{LINE}🌙
    🌟 {{user}} 🌟
-   𝐌𝐎𝐎𝐍𝐋𝐈𝐆𝐇𝐓!
+   **__𝐌𝐎𝐎𝐍𝐋𝐈𝐆𝐇𝐓!__**
 🌙{LINE}🌙
 
-𝐌𝐨𝐨𝐧 𝐫𝐢𝐬𝐞𝐬! 🌙
-𝐒𝐭𝐚𝐫 𝐟𝐚𝐥𝐥𝐬! 🌟
-𝐆𝐨𝐨𝐝𝐛𝐲𝐞! 🌌
+**__𝐌𝐨𝐨𝐧 𝐫𝐢𝐬𝐞𝐬!__** 🌙
+**__𝐒𝐭𝐚𝐫 𝐟𝐚𝐥𝐥𝐬!__** 🌟
+**__𝐆𝐨𝐨𝐝𝐛𝐲𝐞!__** 🌌
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -642,12 +654,12 @@ LEFT_MSGS = [
 
     f"""♾️{LINE}♾️
    🌈 {{user}} 🌈
-   𝐄𝐍𝐃𝐋𝐄𝐒𝐒!
+   **__𝐄𝐍𝐃𝐋𝐄𝐒𝐒!__**
 ♾️{LINE}♾️
 
-𝐉𝐨𝐮𝐫𝐧𝐞𝐲 𝐞𝐧𝐝𝐬! 🚶
-𝐌𝐞𝐦𝐨𝐫𝐢𝐞𝐬 𝐥𝐚𝐬𝐭! 💫
-𝐅𝐢𝐧𝐝 𝐲𝐨𝐮𝐫 𝐫𝐚𝐢𝐧𝐛𝐨𝐰! 🌈
+**__𝐉𝐨𝐮𝐫𝐧𝐞𝐲 𝐞𝐧𝐝𝐬!__** 🚶
+**__𝐌𝐞𝐦𝐨𝐫𝐢𝐞𝐬 𝐥𝐚𝐬𝐭!__** 💫
+**__𝐅𝐢𝐧𝐝 𝐲𝐨𝐮𝐫 𝐫𝐚𝐢𝐧𝐛𝐨𝐰!__** 🌈
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -655,12 +667,12 @@ LEFT_MSGS = [
 
     f"""🦋{LINE}🦋
    🌺 {{user}} 🌺
-   𝐁𝐔𝐓𝐓𝐄𝐑𝐅𝐋𝐘!
+   **__𝐁𝐔𝐓𝐓𝐄𝐑𝐅𝐋𝐘!__**
 🦋{LINE}🦋
 
-𝐒𝐩𝐫𝐞𝐚𝐝 𝐰𝐢𝐧𝐠𝐬! 🦋
-𝐅𝐥𝐲 𝐟𝐫𝐞𝐞! 🌸
-𝐅𝐢𝐧𝐝 𝐧𝐞𝐰 𝐠𝐚𝐫𝐝𝐞𝐧𝐬! 🌻
+**__𝐒𝐩𝐫𝐞𝐚𝐝 𝐰𝐢𝐧𝐠𝐬!__** 🦋
+**__𝐅𝐥𝐲 𝐟𝐫𝐞𝐞!__** 🌸
+**__𝐅𝐢𝐧𝐝 𝐧𝐞𝐰 𝐠𝐚𝐫𝐝𝐞𝐧𝐬!__** 🌻
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -668,12 +680,12 @@ LEFT_MSGS = [
 
     f"""✨{LINE}✨
    ☄️ {{user}} ☄️
-   𝐒𝐓𝐀𝐑𝐃𝐔𝐒𝐓!
+   **__𝐒𝐓𝐀𝐑𝐃𝐔𝐒𝐓!__**
 ✨{LINE}✨
 
-𝐀 𝐬𝐭𝐚𝐫 𝐡𝐚𝐬 𝐠𝐨𝐧𝐞! 🌟
-𝐒𝐡𝐢𝐧𝐞𝐬 𝐞𝐥𝐬𝐞𝐰𝐡𝐞𝐫𝐞! ✨
-𝐆𝐨𝐨𝐝𝐛𝐲𝐞! 👋
+**__𝐀 𝐬𝐭𝐚𝐫 𝐡𝐚𝐬 𝐠𝐨𝐧𝐞!__** 🌟
+**__𝐒𝐡𝐢𝐧𝐞𝐬 𝐞𝐥𝐬𝐞𝐰𝐡𝐞𝐫𝐞!__** ✨
+**__𝐆𝐨𝐨𝐝𝐛𝐲𝐞!__** 👋
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -683,12 +695,12 @@ LEFT_MSGS = [
 MUTE_MSGS = [
     f"""🔇{LINE}🔇
    🤐 {{user}} 🤐
-   𝐌𝐔𝐓𝐄𝐃!
+   **__𝐌𝐔𝐓𝐄𝐃!__**
 🔇{LINE}🔇
 
-𝐔𝐬𝐞𝐫 𝐡𝐚𝐬 𝐛𝐞𝐞𝐧 𝐦𝐮𝐭𝐞𝐝! 🤫
-𝐃𝐮𝐫𝐚𝐭𝐢𝐨𝐧: {{duration}} ⏱️
-𝐁𝐲: {{admin}} 👑
+**__𝐔𝐬𝐞𝐫 𝐡𝐚𝐬 𝐛𝐞𝐞𝐧 𝐦𝐮𝐭𝐞𝐝!__** 🤫
+**__𝐃𝐮𝐫𝐚𝐭𝐢𝐨𝐧:__** {{duration}} ⏱️
+**__𝐁𝐲:__** {{admin}} 👑
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -696,12 +708,12 @@ MUTE_MSGS = [
 
     f"""🔊{LINE}🔊
    🗣️ {{user}} 🗣️
-   𝐔𝐍𝐌𝐔𝐓𝐄𝐃!
+   **__𝐔𝐍𝐌𝐔𝐓𝐄𝐃!__**
 🔊{LINE}🔊
 
-𝐔𝐬𝐞𝐫 𝐡𝐚𝐬 𝐛𝐞𝐞𝐧 𝐮𝐧𝐦𝐮𝐭𝐞𝐝! 🎉
-𝐍𝐨𝐰 𝐭𝐡𝐞𝐲 𝐜𝐚𝐧 𝐬𝐩𝐞𝐚𝐤! 💬
-𝐌𝐮𝐭𝐞 𝐢𝐬 𝐨𝐯𝐞𝐫! ⏰
+**__𝐔𝐬𝐞𝐫 𝐡𝐚𝐬 𝐛𝐞𝐞𝐧 𝐮𝐧𝐦𝐮𝐭𝐞𝐝!__** 🎉
+**__𝐍𝐨𝐰 𝐭𝐡𝐞𝐲 𝐜𝐚𝐧 𝐬𝐩𝐞𝐚𝐤!__** 💬
+**__𝐌𝐮𝐭𝐞 𝐢𝐬 𝐨𝐯𝐞𝐫!__** ⏰
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -709,12 +721,12 @@ MUTE_MSGS = [
 
     f"""🔊{LINE}🔊
    🎉 {{user}} 🎉
-   𝐌𝐔𝐓𝐄 𝐄𝐗𝐏𝐈𝐑𝐄𝐃!
+   **__𝐌𝐔𝐓𝐄 𝐄𝐗𝐏𝐈𝐑𝐄𝐃!__**
 🔊{LINE}🔊
 
-𝐀𝐮𝐭𝐨-𝐮𝐧𝐦𝐮𝐭𝐞𝐝! 🤖
-𝐓𝐢𝐦𝐞 𝐢𝐬 𝐮𝐩! ⏰
-𝐖𝐞𝐥𝐜𝐨𝐦𝐞 𝐛𝐚𝐜𝐤! 👋
+**__𝐀𝐮𝐭𝐨-𝐮𝐧𝐦𝐮𝐭𝐞𝐝!__** 🤖
+**__𝐓𝐢𝐦𝐞 𝐢𝐬 𝐮𝐩!__** ⏰
+**__𝐖𝐞𝐥𝐜𝐨𝐦𝐞 𝐛𝐚𝐜𝐤!__** 👋
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -724,12 +736,12 @@ MUTE_MSGS = [
 REVOKE_MSGS = [
     f"""🔇{LINE}🔇
    🚫 {{user}} 🚫
-   𝐑𝐄𝐕𝐎𝐊𝐄𝐃!
+   **__𝐑𝐄𝐕𝐎𝐊𝐄𝐃!__**
 🔇{LINE}🔇
 
-𝐔𝐬𝐞𝐫'𝐬 𝐦𝐞𝐬𝐬𝐚𝐠𝐞𝐬 𝐰𝐢𝐥𝐥 𝐛𝐞 𝐝𝐞𝐥𝐞𝐭𝐞𝐝! 🗑️
-𝐀𝐥𝐥 𝐦𝐞𝐬𝐬𝐚𝐠𝐞𝐬 𝐰𝐢𝐥𝐥 𝐛𝐞 𝐚𝐮𝐭𝐨-𝐝𝐞𝐥𝐞𝐭𝐞𝐝! 🤖
-𝐁𝐲: {{admin}} 👑
+**__𝐔𝐬𝐞𝐫'𝐬 𝐦𝐞𝐬𝐬𝐚𝐠𝐞𝐬 𝐰𝐢𝐥𝐥 𝐛𝐞 𝐝𝐞𝐥𝐞𝐭𝐞𝐝!__** 🗑️
+**__𝐀𝐥𝐥 𝐦𝐞𝐬𝐬𝐚𝐠𝐞𝐬 𝐰𝐢𝐥𝐥 𝐛𝐞 𝐚𝐮𝐭𝐨-𝐝𝐞𝐥𝐞𝐭𝐞𝐝!__** 🤖
+**__𝐁𝐲:__** {{admin}} 👑
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -737,12 +749,12 @@ REVOKE_MSGS = [
 
     f"""🔊{LINE}🔊
    ✅ {{user}} ✅
-   𝐔𝐍𝐑𝐄𝐕𝐎𝐊𝐄𝐃!
+   **__𝐔𝐍𝐑𝐄𝐕𝐎𝐊𝐄𝐃!__**
 🔊{LINE}🔊
 
-𝐔𝐬𝐞𝐫'𝐬 𝐦𝐞𝐬𝐬𝐚𝐠𝐞𝐬 𝐰𝐢𝐥𝐥 𝐧𝐨𝐭 𝐛𝐞 𝐝𝐞𝐥𝐞𝐭𝐞𝐝! 🎉
-𝐍𝐨𝐰 𝐭𝐡𝐞𝐲 𝐜𝐚𝐧 𝐬𝐞𝐧𝐝 𝐦𝐞𝐬𝐬𝐚𝐠𝐞𝐬 𝐧𝐨𝐫𝐦𝐚𝐥𝐥𝐲! 💬
-𝐁𝐲: {{admin}} 👑
+**__𝐔𝐬𝐞𝐫'𝐬 𝐦𝐞𝐬𝐬𝐚𝐠𝐞𝐬 𝐰𝐢𝐥𝐥 𝐧𝐨𝐭 𝐛𝐞 𝐝𝐞𝐥𝐞𝐭𝐞𝐝!__** 🎉
+**__𝐍𝐨𝐰 𝐭𝐡𝐞𝐲 𝐜𝐚𝐧 𝐬𝐞𝐧𝐝 𝐦𝐞𝐬𝐬𝐚𝐠𝐞𝐬 𝐧𝐨𝐫𝐦𝐚𝐥𝐥𝐲!__** 💬
+**__𝐁𝐲:__** {{admin}} 👑
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -910,7 +922,6 @@ async def mute_user(client, message: Message):
         chat_id = message.chat.id
         user_id = message.from_user.id
         
-        # 🔴 ONLY OWNER CAN USE
         if not is_owner(user_id):
             await message.reply_text(OWNER_ERROR_MSG)
             return
@@ -927,12 +938,10 @@ async def mute_user(client, message: Message):
         
         target_id = target.id
         
-        # 🔴 CHECK: If target is OWNER
         if target_id == OWNER_ID:
             await message.reply_text(OWNER_ERROR_MSG)
             return
         
-        # 🔴 CHECK: If target is ADMIN
         if await is_admin(chat_id, target_id):
             await message.reply_text(ADMIN_ERROR_MSG)
             return
@@ -1001,7 +1010,7 @@ async def mute_user(client, message: Message):
             await app.send_message(chat_id, msg_text)
         
         # 🔴 START AUTO UNMUTE TASK
-        asyncio.create_task(auto_unmute(chat_id, target_id, target.first_name, until_time))
+        asyncio.create_task(auto_unmute(chat_id, target_id, target.first_name, until_time, value, unit))
         logger.info(f"🔇 MUTED: {target.first_name} for {duration}")
         
     except Exception as e:
@@ -1201,7 +1210,7 @@ async def unrevoke_user(client, message: Message):
         await message.reply_text(f"❌ **__Error:__** {str(e)}")
 
 # ========== AUTO UNMUTE ==========
-async def auto_unmute(chat_id, user_id, user_name, until_time):
+async def auto_unmute(chat_id, user_id, user_name, until_time, value, unit):
     try:
         now = datetime.now()
         wait_seconds = (until_time - now).total_seconds()
@@ -1210,16 +1219,20 @@ async def auto_unmute(chat_id, user_id, user_name, until_time):
             wait_seconds = 0
         
         if wait_seconds > 0:
-            logger.info(f"⏳ Auto-unmute in {wait_seconds} seconds for {user_name}")
+            duration_str = format_duration(value, unit)
+            logger.info(f"⏳ Auto-unmute in {wait_seconds} seconds for {user_name} (Duration: {duration_str})")
             await asyncio.sleep(wait_seconds)
         
+        # Check if revoked - if revoked, don't unmute
         if is_revoked(chat_id, user_id):
             logger.info(f"🔇 User {user_name} is revoked, not auto-unmuting")
             return
         
+        # Check if still muted
         if is_muted(chat_id, user_id):
             remove_mute(chat_id, user_id)
             
+            # Restore all permissions
             try:
                 await app.restrict_chat_member(
                     chat_id=chat_id,
@@ -1235,6 +1248,7 @@ async def auto_unmute(chat_id, user_id, user_name, until_time):
             except Exception as e:
                 logger.error(f"❌ Auto-unmute restrict error: {e}")
             
+            # Send auto-unmute notification with video
             user_mention = f"[{user_name}](tg://user?id={user_id})"
             time = get_current_time()
             date = get_current_date()
@@ -1259,6 +1273,8 @@ async def auto_unmute(chat_id, user_id, user_name, until_time):
                 await app.send_message(chat_id, msg_text)
             
             logger.info(f"🔊 AUTO UNMUTED: {user_name}")
+        else:
+            logger.info(f"ℹ️ User {user_name} is already unmuted")
             
     except asyncio.CancelledError:
         logger.info(f"⏹️ Auto-unmute cancelled for {user_name}")
