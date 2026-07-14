@@ -32,8 +32,8 @@ REVOKE_DB = "revoke.json"
 IST = pytz.timezone('Asia/Kolkata')
 
 # ========== LINE SIZES ==========
-LINE = "━━━━━━━━━━━━━━"
-LINE_BIG = "━━━━━━━━━━━━━━━━━━━━━━━"
+LINE = "━━━━━━━━━━━━━━━━━━━"
+LINE_BIG = "━━━━━━━━━━━━━━━━━━━━━━"
 
 # ========== USED VIDEOS TRACKING ==========
 used_video_ids = []
