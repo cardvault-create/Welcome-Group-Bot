@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 # ========== 🔴 APNA DATA DAALO ==========
 API_ID = 35140329
 API_HASH = "011f638e4acadee178c59afffc80193d"
-BOT_TOKEN = "8603632286:AAE8Hw5xWzKjrpr4r7PrrMifZxu7-v93TaM"
+BOT_TOKEN = "8603632286:AAEK7TKZ-XLXTXUSniwqsHAZ1Fr89RPB1cU"
 OWNER_ID = 7614459746
 OWNER_USERNAME = "BESTCHEAT_OWNER"
 
@@ -31,8 +31,9 @@ REVOKE_DB = "revoke.json"
 # ========== TIMEZONE ==========
 IST = pytz.timezone('Asia/Kolkata')
 
-# ========== LINE SIZE ==========
-LINE = "━━━━━━━━━━━━━━━━━"
+# ========== LINE SIZES ==========
+LINE = "━━━━━━━━━━━━━━━━━"          # 15 dashes - normal lines
+LINE_BIG = "━━━━━━━━━━━━━━━━━━━━━━━"  # 23 dashes - date lines
 
 # ========== DATABASE FUNCTIONS ==========
 def load_videos():
@@ -167,10 +168,13 @@ def is_muted(group_id, user_id):
         until = mutes[key]
         if until == "permanent":
             return True
-        until_time = datetime.fromisoformat(until)
-        if datetime.now() < until_time:
-            return True
-        else:
+        try:
+            until_time = datetime.fromisoformat(until)
+            if datetime.now() < until_time:
+                return True
+            else:
+                remove_mute(group_id, user_id)
+        except:
             remove_mute(group_id, user_id)
     return False
 
@@ -237,9 +241,9 @@ JOIN_MSGS = [
 𝐘𝐨𝐮'𝐫𝐞 𝐮𝐧𝐬𝐭𝐨𝐩𝐩𝐚𝐛𝐥𝐞! 💪
 𝐁𝐨𝐫𝐧 𝐭𝐨 𝐰𝐢𝐧! 🏆
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}""",
+{LINE_BIG}""",
 
     f"""👑{LINE}👑
    🦁 {{user}} 🦁
@@ -250,9 +254,9 @@ JOIN_MSGS = [
 𝐘𝐨𝐮'𝐫𝐞 𝐭𝐡𝐞 𝐫𝐮𝐥𝐞𝐫! ⚔️
 𝐋𝐞𝐭'𝐬 𝐜𝐨𝐧𝐪𝐮𝐞𝐫! 🏰
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}""",
+{LINE_BIG}""",
 
     f"""🐉{LINE}🐉
    ⚡ {{user}} ⚡
@@ -263,9 +267,9 @@ JOIN_MSGS = [
 𝐅𝐢𝐫𝐞 𝐢𝐧 𝐭𝐡𝐞 𝐬𝐨𝐮𝐥! 🔥
 𝐔𝐧𝐥𝐞𝐚𝐬𝐡 𝐩𝐨𝐰𝐞𝐫! ⚡
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}""",
+{LINE_BIG}""",
 
     f"""🐺{LINE}🐺
    🌙 {{user}} 🌙
@@ -276,9 +280,9 @@ JOIN_MSGS = [
 𝐋𝐞𝐚𝐝𝐞𝐫 𝐨𝐟 𝐩𝐚𝐜𝐤! 🐾
 𝐋𝐞𝐭'𝐬 𝐡𝐨𝐰𝐥! 🌙
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}""",
+{LINE_BIG}""",
 
     f"""💪{LINE}💪
    🦍 {{user}} 🦍
@@ -289,9 +293,9 @@ JOIN_MSGS = [
 𝐒𝐭𝐫𝐞𝐧𝐠𝐭𝐡 𝐮𝐧𝐥𝐞𝐚𝐬𝐡! ⚡
 𝐋𝐞𝐭'𝐬 𝐝𝐨𝐦𝐢𝐧𝐚𝐭𝐞! 🔥
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}""",
+{LINE_BIG}""",
 
     f"""🌌{LINE}🌌
    🚀 {{user}} 🚀
@@ -302,9 +306,9 @@ JOIN_MSGS = [
 𝐁𝐞𝐲𝐨𝐧𝐝 𝐭𝐡𝐢𝐬 𝐰𝐨𝐫𝐥𝐝! 👽
 𝐂𝐨𝐬𝐦𝐨𝐬 𝐰𝐚𝐢𝐭𝐬! 🌠
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}""",
+{LINE_BIG}""",
 
     f"""🏯{LINE}🏯
    🐯 {{user}} 🐯
@@ -315,9 +319,9 @@ JOIN_MSGS = [
 𝐑𝐞𝐬𝐩𝐞𝐜𝐭 𝐭𝐡𝐞 𝐜𝐫𝐨𝐰𝐧! ⚜️
 𝐋𝐞𝐠𝐞𝐧𝐝 𝐛𝐞𝐠𝐢𝐧𝐬! 📜
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}""",
+{LINE_BIG}""",
 
     f"""🦄{LINE}🦄
    ✨ {{user}} ✨
@@ -328,9 +332,9 @@ JOIN_MSGS = [
 𝐌𝐚𝐠𝐢𝐜 𝐢𝐧 𝐚𝐢𝐫! ✨
 𝐎𝐧𝐞 𝐨𝐟 𝐚 𝐤𝐢𝐧𝐝! 💫
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}""",
+{LINE_BIG}""",
 
     f"""🦈{LINE}🦈
    ⚓ {{user}} ⚓
@@ -341,9 +345,9 @@ JOIN_MSGS = [
 𝐑𝐮𝐥𝐞 𝐭𝐡𝐞 𝐝𝐞𝐞𝐩! 🏊
 𝐔𝐧𝐬𝐭𝐨𝐩𝐩𝐚𝐛𝐥𝐞! 💪
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}""",
+{LINE_BIG}""",
 
     f"""🦅{LINE}🦅
    ☀️ {{user}} ☀️
@@ -354,9 +358,9 @@ JOIN_MSGS = [
 𝐅𝐥𝐲 𝐡𝐢𝐠𝐡! 𝐃𝐫𝐞𝐚𝐦 𝐛𝐢𝐠! ☀️
 𝐒𝐤𝐲 𝐢𝐬 𝐭𝐡𝐞 𝐥𝐢𝐦𝐢𝐭! 🌤️
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}"""
+{LINE_BIG}"""
 ]
 
 BAN_MSGS = [
@@ -369,9 +373,9 @@ BAN_MSGS = [
 𝐀𝐜𝐭𝐢𝐨𝐧 𝐰𝐚𝐬 𝐧𝐞𝐞𝐝𝐞𝐝! ⚡
 𝐆𝐫𝐨𝐮𝐩 𝐢𝐬 𝐬𝐚𝐟𝐞! 🛡️
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}""",
+{LINE_BIG}""",
 
     f"""🔨{LINE}🔨
    🚷 {{user}} 🚷
@@ -382,9 +386,9 @@ BAN_MSGS = [
 𝐍𝐨 𝐭𝐨𝐥𝐞𝐫𝐚𝐧𝐜𝐞! ❌
 𝐑𝐮𝐥𝐞𝐬 𝐚𝐫𝐞 𝐫𝐮𝐥𝐞𝐬! 📜
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}""",
+{LINE_BIG}""",
 
     f"""🚀{LINE}🚀
    💢 {{user}} 💢
@@ -395,9 +399,9 @@ BAN_MSGS = [
 𝐆𝐫𝐨𝐮𝐩 𝐦𝐨𝐯𝐞𝐬 𝐨𝐧! 🚶
 𝐆𝐨𝐨𝐝𝐛𝐲𝐞! 👋
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}""",
+{LINE_BIG}""",
 
     f"""🔒{LINE}🔒
    🚷 {{user}} 🚷
@@ -408,9 +412,9 @@ BAN_MSGS = [
 𝐒𝐞𝐜𝐮𝐫𝐢𝐭𝐲 𝐚𝐜𝐭𝐢𝐯𝐚𝐭𝐞𝐝! 🛡️
 𝐒𝐚𝐟𝐞 𝐬𝐩𝐚𝐜𝐞! ✨
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}""",
+{LINE_BIG}""",
 
     f"""🚫{LINE}🚫
    ⛔️ {{user}} ⛔️
@@ -421,9 +425,9 @@ BAN_MSGS = [
 𝐖𝐚𝐫𝐧𝐢𝐧𝐠𝐬 𝐢𝐠𝐧𝐨𝐫𝐞𝐝! 👀
 𝐓𝐢𝐦𝐞 𝐭𝐨 𝐠𝐨! 🚪
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}""",
+{LINE_BIG}""",
 
     f"""💀{LINE}💀
    ⚡ {{user}} ⚡
@@ -434,9 +438,9 @@ BAN_MSGS = [
 𝐍𝐨 𝐫𝐞𝐭𝐮𝐫𝐧! 🚫
 𝐓𝐡𝐞 𝐞𝐧𝐝! 💥
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}""",
+{LINE_BIG}""",
 
     f"""🗡️{LINE}🗡️
    💢 {{user}} 💢
@@ -447,9 +451,9 @@ BAN_MSGS = [
 𝐑𝐮𝐥𝐞𝐬 𝐰𝐞𝐫𝐞 𝐜𝐥𝐞𝐚𝐫! 📋
 𝐆𝐨𝐨𝐝𝐛𝐲𝐞! 👋
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}""",
+{LINE_BIG}""",
 
     f"""🔐{LINE}🔐
    🚷 {{user}} 🚷
@@ -460,9 +464,9 @@ BAN_MSGS = [
 𝐏𝐞𝐫𝐦𝐚𝐧𝐞𝐧𝐭 𝐚𝐜𝐭𝐢𝐨𝐧! ⚖️
 𝐌𝐨𝐯𝐞 𝐨𝐧! 🚶
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}""",
+{LINE_BIG}""",
 
     f"""🎯{LINE}🎯
    ⛔️ {{user}} ⛔️
@@ -473,9 +477,9 @@ BAN_MSGS = [
 𝐍𝐨 𝐦𝐞𝐫𝐜𝐲! ❌
 𝐑𝐮𝐥𝐞𝐬 𝐰𝐢𝐧! ⚔️
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}""",
+{LINE_BIG}""",
 
     f"""💥{LINE}💥
    💢 {{user}} 💢
@@ -486,9 +490,9 @@ BAN_MSGS = [
 𝐍𝐨 𝐜𝐨𝐦𝐢𝐧𝐠 𝐛𝐚𝐜𝐤! 🚫
 𝐈𝐭'𝐬 𝐨𝐯𝐞𝐫! 🎬
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}"""
+{LINE_BIG}"""
 ]
 
 LEFT_MSGS = [
@@ -501,9 +505,9 @@ LEFT_MSGS = [
 𝐓𝐚𝐤𝐞 𝐜𝐚𝐫𝐞! 🌈
 𝐇𝐨𝐩𝐞 𝐭𝐨 𝐬𝐞𝐞 𝐚𝐠𝐚𝐢𝐧! 🌟
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}""",
+{LINE_BIG}""",
 
     f"""🚶{LINE}🚶
    🌅 {{user}} 🌅
@@ -514,9 +518,9 @@ LEFT_MSGS = [
 𝐓𝐡𝐞 𝐬𝐮𝐧 𝐬𝐞𝐭𝐬! 🌅
 𝐆𝐨𝐨𝐝𝐛𝐲𝐞! 👋
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}""",
+{LINE_BIG}""",
 
     f"""🕊️{LINE}🕊️
    💫 {{user}} 💫
@@ -527,9 +531,9 @@ LEFT_MSGS = [
 𝐅𝐢𝐧𝐝 𝐲𝐨𝐮𝐫 𝐰𝐚𝐲! 🌟
 𝐘𝐨𝐮'𝐥𝐥 𝐛𝐞 𝐦𝐢𝐬𝐬𝐞𝐝! 💔
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}""",
+{LINE_BIG}""",
 
     f"""🌊{LINE}🌊
    🚣 {{user}} 🚣
@@ -540,9 +544,9 @@ LEFT_MSGS = [
 𝐅𝐢𝐧𝐝 𝐩𝐞𝐚𝐜𝐞! 🌅
 𝐓𝐡𝐞 𝐬𝐞𝐚 𝐰𝐚𝐢𝐭𝐬! 🌊
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}""",
+{LINE_BIG}""",
 
     f"""✌️{LINE}✌️
    ☮️ {{user}} ☮️
@@ -553,9 +557,9 @@ LEFT_MSGS = [
 𝐅𝐢𝐧𝐝 𝐣𝐨𝐲! 😊
 𝐓𝐚𝐤𝐞 𝐜𝐚𝐫𝐞! ✌️
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}""",
+{LINE_BIG}""",
 
     f"""🌹{LINE}🌹
    🥀 {{user}} 🥀
@@ -566,9 +570,9 @@ LEFT_MSGS = [
 𝐋𝐞𝐠𝐞𝐧𝐝𝐬 𝐫𝐞𝐦𝐚𝐢𝐧! 📜
 𝐒𝐞𝐞 𝐲𝐨𝐮 𝐬𝐨𝐨𝐧! 👋
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}""",
+{LINE_BIG}""",
 
     f"""🌙{LINE}🌙
    🌟 {{user}} 🌟
@@ -579,9 +583,9 @@ LEFT_MSGS = [
 𝐒𝐭𝐚𝐫 𝐟𝐚𝐥𝐥𝐬! 🌟
 𝐆𝐨𝐨𝐝𝐛𝐲𝐞! 🌌
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}""",
+{LINE_BIG}""",
 
     f"""♾️{LINE}♾️
    🌈 {{user}} 🌈
@@ -592,9 +596,9 @@ LEFT_MSGS = [
 𝐌𝐞𝐦𝐨𝐫𝐢𝐞𝐬 𝐥𝐚𝐬𝐭! 💫
 𝐅𝐢𝐧𝐝 𝐲𝐨𝐮𝐫 𝐫𝐚𝐢𝐧𝐛𝐨𝐰! 🌈
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}""",
+{LINE_BIG}""",
 
     f"""🦋{LINE}🦋
    🌺 {{user}} 🌺
@@ -605,9 +609,9 @@ LEFT_MSGS = [
 𝐅𝐥𝐲 𝐟𝐫𝐞𝐞! 🌸
 𝐅𝐢𝐧𝐝 𝐧𝐞𝐰 𝐠𝐚𝐫𝐝𝐞𝐧𝐬! 🌻
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}""",
+{LINE_BIG}""",
 
     f"""✨{LINE}✨
    ☄️ {{user}} ☄️
@@ -618,9 +622,9 @@ LEFT_MSGS = [
 𝐒𝐡𝐢𝐧𝐞𝐬 𝐞𝐥𝐬𝐞𝐰𝐡𝐞𝐫𝐞! ✨
 𝐆𝐨𝐨𝐝𝐛𝐲𝐞! 👋
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}"""
+{LINE_BIG}"""
 ]
 
 MUTE_MSGS = [
@@ -633,9 +637,9 @@ MUTE_MSGS = [
 𝐃𝐮𝐫𝐚𝐭𝐢𝐨𝐧: {{duration}} ⏱️
 𝐁𝐲: {{admin}} 👑
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}""",
+{LINE_BIG}""",
 
     f"""🔇{LINE}🔇
    ⛔️ {{user}} ⛔️
@@ -646,9 +650,9 @@ MUTE_MSGS = [
 𝐍𝐨 𝐭𝐨𝐥𝐞𝐫𝐚𝐧𝐜𝐞! ❌
 𝐁𝐲: {{admin}} 👑
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}"""
+{LINE_BIG}"""
 ]
 
 UNMUTE_MSGS = [
@@ -661,9 +665,9 @@ UNMUTE_MSGS = [
 𝐍𝐨𝐰 𝐭𝐡𝐞𝐲 𝐜𝐚𝐧 𝐬𝐩𝐞𝐚𝐤! 💬
 𝐌𝐮𝐭𝐞 𝐢𝐬 𝐨𝐯𝐞𝐫! ⏰
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}""",
+{LINE_BIG}""",
 
     f"""🔊{LINE}🔊
    🎉 {{user}} 🎉
@@ -674,9 +678,9 @@ UNMUTE_MSGS = [
 𝐓𝐢𝐦𝐞 𝐢𝐬 𝐮𝐩! ⏰
 𝐖𝐞𝐥𝐜𝐨𝐦𝐞 𝐛𝐚𝐜𝐤! 👋
 
-{LINE}
+{LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
-{LINE}"""
+{LINE_BIG}"""
 ]
 
 # ========== BOT CREATE ==========
@@ -743,7 +747,7 @@ async def add_group_from_group(client, message: Message):
         
         groups = load_groups()
         if str(chat_id) in groups:
-            await message.reply_text(
+            sent = await message.reply_text(
                 f"""✅{LINE}✅
    ⚠️ **__𝗔𝗟𝗥𝗘𝗔𝗗𝗬 𝗔𝗗𝗗𝗘𝗗!__** ⚠️
 ✅{LINE}✅
@@ -758,6 +762,11 @@ async def add_group_from_group(client, message: Message):
 🌌 **__𝗣𝗥𝗘𝗠𝗜𝗨𝗠 𝗔𝗖𝗧𝗜𝗩𝗘__** 🌌
 {LINE}"""
             )
+            await asyncio.sleep(5)
+            try:
+                await sent.delete()
+            except:
+                pass
             return
         
         save_group(chat_id, chat_name)
@@ -790,7 +799,7 @@ async def add_group_from_group(client, message: Message):
         logger.info(f"✅ Group auto-added: {chat_name}")
         
     except Exception as e:
-        await message.reply_text(f"❌ **__Error:__** {str(e)}")
+        logger.error(f"❌ Error: {e}")
 
 # ========== SERVICE MESSAGES ==========
 @app.on_message(filters.group & filters.service)
@@ -840,6 +849,10 @@ async def mute_user(client, message: Message):
             return
         
         target = message.reply_to_message.from_user
+        if target is None:
+            await message.reply_text(f"❌{LINE}❌\n   **__User not found!__**\n❌{LINE}❌")
+            return
+        
         target_id = target.id
         
         parts = message.text.split()
@@ -939,6 +952,10 @@ async def permanent_mute(client, message: Message):
             return
         
         target = message.reply_to_message.from_user
+        if target is None:
+            await message.reply_text(f"❌{LINE}❌\n   **__User not found!__**\n❌{LINE}❌")
+            return
+        
         target_id = target.id
         
         # Remove from normal mute
@@ -1006,6 +1023,10 @@ async def unmute_user(client, message: Message):
             return
         
         target = message.reply_to_message.from_user
+        if target is None:
+            await message.reply_text(f"❌{LINE}❌\n   **__User not found!__**\n❌{LINE}❌")
+            return
+        
         target_id = target.id
         
         # Remove from revoke
@@ -1148,11 +1169,11 @@ async def start_command(client, message):
 𝐈𝐟 𝐲𝐨𝐮 𝐰𝐚𝐧𝐭 𝐭𝐨 𝐚𝐝𝐝 𝐭𝐡𝐢𝐬 𝐛𝐨𝐭 𝐭𝐨 𝐲𝐨𝐮𝐫 𝐠𝐫𝐨𝐮𝐩, 📌
 𝐂𝐨𝐧𝐭𝐚𝐜𝐭 **__𝐁𝐄𝐒𝐓 𝘾𝙃𝙀𝘼𝙏 ᵒʷⁿᵉʳ__** 💬
 
-{LINE}
+{LINE_BIG}
 🕐 {get_current_time()}  •  📅 {get_current_date()}
-{LINE}
+{LINE_BIG}
 🚫 **__𝗥𝗘𝗦𝗧𝗥𝗜𝗖𝗧𝗘𝗗 𝗔𝗖𝗖𝗘𝗦𝗦__** 🚫
-{LINE}""",
+{LINE_BIG}""",
             reply_markup=InlineKeyboardMarkup([
                 [InlineKeyboardButton("📩 ᴄᴏɴᴛᴀᴄᴛ ᴏᴡɴᴇʀ", url=f"https://t.me/{OWNER_USERNAME}")]
             ])
@@ -1191,9 +1212,9 @@ async def start_command(client, message):
 
 📊 **__/stats__** - **__sᴛᴀᴛs__**
 
-{LINE}
+{LINE_BIG}
 💎 **__ᴘʀᴇᴍɪᴜᴍ ᴀᴄᴛɪᴠᴇ__** 💎
-{LINE}"""
+{LINE_BIG}"""
     )
 
 # ========== OTHER COMMANDS ==========
@@ -1345,9 +1366,9 @@ async def stats_cmd(client, message):
 ✅ Enabled: {sum(1 for g in groups.values() if g.get('enabled', True))}
 
 ⏰ {datetime.now(IST).strftime('%d %b %Y %I:%M %p')}
-{LINE}
+{LINE_BIG}
 💎 Premium Active 💎
-{LINE}"""
+{LINE_BIG}"""
     await message.reply_text(text)
 
 # ========== RUN ==========
