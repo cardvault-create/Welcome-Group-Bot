@@ -42,7 +42,7 @@ used_video_ids = []
 OWNER_ERROR_MSG = f"""❌{LINE}❌
   ☆ 
   .•° <b>Hey! You can't use this command!</b> ❗
-  ✾ <b>This user is the bot father, you can't do anything!</b> °˳˳˳!!♡🇵🇹
+  ✾ <b>Only Bot Father Can Restore, You Can't Do Anything!</b> °˳˳˳!!♡🇵🇹
 ❌{LINE}❌"""
 
 ADMIN_ERROR_MSG = f"""❌{LINE}❌
