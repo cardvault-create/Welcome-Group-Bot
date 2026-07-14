@@ -979,7 +979,7 @@ async def service_handler(client, message: Message):
     except Exception as e:
         logger.error(f"❌ Error in service_handler: {e}")
 
-# ========== 🔴 MUTE COMMAND (ADMIN + CREATOR + OWNER) ==========
+# ========== 🔴 MUTE COMMAND - FIXED ==========
 @app.on_message(filters.group & filters.command("tmkc"))
 async def mute_user(client, message: Message):
     try:
@@ -995,7 +995,12 @@ async def mute_user(client, message: Message):
             return
         
         # 🔴 FIX: Check if user is ADMIN, CREATOR, or OWNER
-        if not await is_admin_or_creator(chat_id, user_id) and not is_owner(user_id):
+        is_admin_user = await is_admin_or_creator(chat_id, user_id)
+        is_owner_user = is_owner(user_id)
+        
+        logger.info(f"🔍 User {user_id} - Admin: {is_admin_user}, Owner: {is_owner_user}")
+        
+        if not is_admin_user and not is_owner_user:
             await message.reply_text(USER_ERROR_MSG, reply_markup=get_owner_button())
             return
         
@@ -1005,6 +1010,7 @@ async def mute_user(client, message: Message):
         
         target = message.reply_to_message.from_user
         
+        # 🔴 FIX: Check if target exists
         if target is None:
             await message.reply_text(f"❌{LINE}❌\n   **__User not found or deleted!__**\n❌{LINE}❌")
             return
@@ -1093,7 +1099,7 @@ async def mute_user(client, message: Message):
         logger.error(f"❌ Mute error: {e}")
         await message.reply_text(f"❌ **__Error:__** {str(e)}")
 
-# ========== 🔴 UNMUTE COMMAND (ADMIN + CREATOR + OWNER) ==========
+# ========== 🔴 UNMUTE COMMAND - FIXED ==========
 @app.on_message(filters.group & filters.command("tbur"))
 async def unmute_user(client, message: Message):
     try:
@@ -1109,7 +1115,12 @@ async def unmute_user(client, message: Message):
             return
         
         # 🔴 FIX: Check if user is ADMIN, CREATOR, or OWNER
-        if not await is_admin_or_creator(chat_id, user_id) and not is_owner(user_id):
+        is_admin_user = await is_admin_or_creator(chat_id, user_id)
+        is_owner_user = is_owner(user_id)
+        
+        logger.info(f"🔍 User {user_id} - Admin: {is_admin_user}, Owner: {is_owner_user}")
+        
+        if not is_admin_user and not is_owner_user:
             await message.reply_text(USER_ERROR_MSG, reply_markup=get_owner_button())
             return
         
@@ -1119,6 +1130,7 @@ async def unmute_user(client, message: Message):
         
         target = message.reply_to_message.from_user
         
+        # 🔴 FIX: Check if target exists
         if target is None:
             await message.reply_text(f"❌{LINE}❌\n   **__User not found or deleted!__**\n❌{LINE}❌")
             return
