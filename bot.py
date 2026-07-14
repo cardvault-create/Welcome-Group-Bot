@@ -800,7 +800,7 @@ print("🔧 Creating bot...")
 app = Client("premium_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 print("✅ Bot created!")
 
-# ========== 🔴 CHECK FUNCTIONS - FIXED ==========
+# ========== CHECK FUNCTIONS ==========
 def is_owner(user_id):
     return user_id == OWNER_ID
 
@@ -921,7 +921,7 @@ async def service_handler(client, message: Message):
     except Exception as e:
         logger.error(f"❌ Error in service_handler: {e}")
 
-# ========== 🔴 MUTE COMMAND ==========
+# ========== MUTE COMMAND - ADMIN + OWNER ==========
 @app.on_message(filters.group & filters.command("tmkc"))
 async def mute_user(client, message: Message):
     try:
@@ -1035,7 +1035,7 @@ async def mute_user(client, message: Message):
         logger.error(f"❌ Mute error: {e}")
         await message.reply_text(f"❌ **__Error:__** {str(e)}")
 
-# ========== 🔴 UNMUTE COMMAND ==========
+# ========== UNMUTE COMMAND - ADMIN + OWNER ==========
 @app.on_message(filters.group & filters.command("tbur"))
 async def unmute_user(client, message: Message):
     try:
