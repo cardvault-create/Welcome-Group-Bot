@@ -44,16 +44,25 @@ def get_owner_button():
         [InlineKeyboardButton(" ✾ ☆ .•°Contact-Father°˳˳˳!!♡🇵🇹", url=f"https://t.me/{OWNER_USERNAME}")]
     ])
 
-OWNER_ERROR_MSG = f"""❌{LINE}❌
+# 🔴 FIXED: Better error messages
+REPLY_ERROR_MSG = f"""❌{LINE}❌
+  ☆ 
+  .•° <b>Please reply to a user!</b> ❗
+  ✾ <b>Use: /tmkc @username 30s-60s</b>
+  ✾ <b>Or reply to user's message</b>
+❌{LINE}❌"""
+
+ADMIN_TARGET_ERROR = f"""❌{LINE}❌
+  ☆ 
+  .•° <b>You can't mute a group admin!</b> ❗
+  ✾ <b>This user is a group admin</b>
+  ✾ <b>You can't do anything!</b> °˳˳˳!!♡🇵🇹
+❌{LINE}❌"""
+
+OWNER_TARGET_ERROR = f"""❌{LINE}❌
   ☆ 
   .•° <b>Hey! You can't use this command!</b> ❗
   ✾ <b>This User Is A Bot Father, You Can't Do Anything!</b> °˳˳˳!!♡🇵🇹
-❌{LINE}❌"""
-
-ADMIN_ERROR_MSG = f"""❌{LINE}❌
-  ☆ 
-  .•° <b>Hey! You can't use this command!</b> ❗
-  ✾ <b>This User Is A Group Admin, You Can't Do Anything!</b> °˳˳˳!!♡🇵🇹
 ❌{LINE}❌"""
 
 USER_ERROR_MSG = f"""❌{LINE}❌
@@ -921,6 +930,7 @@ async def mute_user(client, message: Message):
         chat_id = message.chat.id
         user_id = message.from_user.id
 
+        # Revoked user check
         if is_revoked(chat_id, user_id):
             try:
                 await message.delete()
@@ -928,12 +938,14 @@ async def mute_user(client, message: Message):
                 pass
             return
 
+        # Admin/Owner check
         if not await is_admin_or_creator(chat_id, user_id) and not is_owner(user_id):
             await message.reply_text(USER_ERROR_MSG, reply_markup=get_owner_button())
             return
 
+        # 🔴 FIX: Check if reply exists
         if not message.reply_to_message:
-            await message.reply_text(f"❌{LINE}❌\n   **__Reply to a user!__**\n❌{LINE}❌")
+            await message.reply_text(REPLY_ERROR_MSG)
             return
 
         target = message.reply_to_message.from_user
@@ -945,12 +957,14 @@ async def mute_user(client, message: Message):
 
         target_id = target.id
 
+        # Target is Owner
         if target_id == OWNER_ID:
-            await message.reply_text(OWNER_ERROR_MSG, reply_markup=get_owner_button())
+            await message.reply_text(OWNER_TARGET_ERROR, reply_markup=get_owner_button())
             return
 
+        # Target is Admin
         if await is_admin_or_creator(chat_id, target_id):
-            await message.reply_text(ADMIN_ERROR_MSG, reply_markup=get_owner_button())
+            await message.reply_text(ADMIN_TARGET_ERROR, reply_markup=get_owner_button())
             return
 
         if not await is_user_in_group(chat_id, target_id):
@@ -1043,12 +1057,11 @@ async def unmute_user(client, message: Message):
             return
 
         if not message.reply_to_message:
-            await message.reply_text(f"❌{LINE}❌\n   **__Reply to a user!__**\n❌{LINE}❌")
+            await message.reply_text(REPLY_ERROR_MSG)
             return
 
         target = message.reply_to_message.from_user
 
-        # 🔴 FIX: Check if target exists
         if target is None:
             await message.reply_text(f"❌{LINE}❌\n   **__User not found or deleted!__**\n❌{LINE}❌")
             return
@@ -1107,7 +1120,7 @@ async def unmute_user(client, message: Message):
 async def revoke_user(client, message: Message):
     try:
         if not is_owner(message.from_user.id):
-            await message.reply_text(OWNER_ERROR_MSG, reply_markup=get_owner_button())
+            await message.reply_text(OWNER_TARGET_ERROR, reply_markup=get_owner_button())
             return
 
         chat_id = message.chat.id
@@ -1118,7 +1131,7 @@ async def revoke_user(client, message: Message):
             pass
 
         if not message.reply_to_message:
-            await message.reply_text(f"❌{LINE}❌\n   **__Reply to a user!__**\n❌{LINE}❌")
+            await message.reply_text(REPLY_ERROR_MSG)
             return
 
         target = message.reply_to_message.from_user
@@ -1162,7 +1175,7 @@ async def revoke_user(client, message: Message):
 async def unrevoke_user(client, message: Message):
     try:
         if not is_owner(message.from_user.id):
-            await message.reply_text(OWNER_ERROR_MSG, reply_markup=get_owner_button())
+            await message.reply_text(OWNER_TARGET_ERROR, reply_markup=get_owner_button())
             return
 
         chat_id = message.chat.id
