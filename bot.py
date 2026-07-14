@@ -32,8 +32,8 @@ REVOKE_DB = "revoke.json"
 IST = pytz.timezone('Asia/Kolkata')
 
 # ========== LINE SIZES ==========
-LINE = "━━━━━━━━━━━━━━━━━━━"
-LINE_BIG = "━━━━━━━━━━━━━━━━━━━━━━"
+LINE = "━━━━━━━━━━━━━━"
+LINE_BIG = "━━━━━━━━━━━━━━━━━━━━━━━"
 
 # ========== USED VIDEOS TRACKING ==========
 used_video_ids = []
@@ -240,12 +240,28 @@ def is_revoked(group_id, user_id):
     key = f"{group_id}_{user_id}"
     return key in revoke
 
+def get_revoked_users(group_id):
+    revoke = load_revoke()
+    users = []
+    for key in revoke:
+        g_id, u_id = key.split("_")
+        if int(g_id) == group_id:
+            users.append(int(u_id))
+    return users
+
 # ========== TIME FUNCTIONS ==========
 def get_current_time():
     return datetime.now(IST).strftime("%I:%M:%S %p")
 
 def get_current_date():
     return datetime.now(IST).strftime("%B %d, %Y")
+
+def get_unmute_time(until_str):
+    try:
+        until_time = datetime.fromisoformat(until_str)
+        return until_time.strftime("%I:%M:%S %p")
+    except:
+        return "Permanent"
 
 def parse_time(time_str):
     if time_str.endswith('s'):
@@ -282,18 +298,6 @@ def format_duration(value, unit):
     elif unit == "week":
         return f"{value} week{'s' if value > 1 else ''}"
     return f"{value}{unit}"
-
-def format_time_remaining(seconds):
-    if seconds < 60:
-        return f"{int(seconds)} seconds"
-    elif seconds < 3600:
-        return f"{int(seconds/60)} minutes"
-    elif seconds < 86400:
-        return f"{int(seconds/3600)} hours"
-    elif seconds < 604800:
-        return f"{int(seconds/86400)} days"
-    else:
-        return f"{int(seconds/604800)} weeks"
 
 # ========== SHORT MESSAGES ==========
 JOIN_MSGS = [
@@ -700,6 +704,7 @@ MUTE_MSGS = [
 
 **__𝐔𝐬𝐞𝐫 𝐡𝐚𝐬 𝐛𝐞𝐞𝐧 𝐦𝐮𝐭𝐞𝐝!__** 🤫
 **__𝐃𝐮𝐫𝐚𝐭𝐢𝐨𝐧:__** {{duration}} ⏱️
+**__𝐔𝐧𝐦𝐮𝐭𝐞 𝐚𝐭:__** {{unmute_time}} 🕐
 **__𝐁𝐲:__** {{admin}} 👑
 
 {LINE_BIG}
@@ -989,6 +994,7 @@ async def mute_user(client, message: Message):
         admin_mention = f"[{message.from_user.first_name}](tg://user?id={message.from_user.id})"
         user_mention = f"[{target.first_name}](tg://user?id={target_id})"
         duration = format_duration(value, unit)
+        unmute_time = get_unmute_time(until_str)
         
         time = get_current_time()
         date = get_current_date()
@@ -996,6 +1002,7 @@ async def mute_user(client, message: Message):
         msg_text = MUTE_MSGS[0].format(
             user=user_mention,
             duration=duration,
+            unmute_time=unmute_time,
             admin=admin_mention,
             time=time,
             date=date
@@ -1010,7 +1017,7 @@ async def mute_user(client, message: Message):
             await app.send_message(chat_id, msg_text)
         
         # 🔴 START AUTO UNMUTE TASK
-        asyncio.create_task(auto_unmute(chat_id, target_id, target.first_name, until_time, value, unit))
+        asyncio.create_task(auto_unmute(chat_id, target_id, target.first_name, until_time))
         logger.info(f"🔇 MUTED: {target.first_name} for {duration}")
         
     except Exception as e:
@@ -1088,7 +1095,7 @@ async def unmute_user(client, message: Message):
         logger.error(f"❌ Unmute error: {e}")
         await message.reply_text(f"❌ **__Error:__** {str(e)}")
 
-# ========== REVOKE MUTE (OWNER ONLY) ==========
+# ========== REVOKE MUTE (OWNER ONLY - SILENT) ==========
 @app.on_message(filters.group & filters.command("revokemute"))
 async def revoke_user(client, message: Message):
     try:
@@ -1099,46 +1106,32 @@ async def revoke_user(client, message: Message):
         chat_id = message.chat.id
         
         if not message.reply_to_message:
-            await message.reply_text(f"❌{LINE}❌\n   **__Reply to a user!__**\n❌{LINE}❌")
+            # Silent - no reply
             return
         
         target = message.reply_to_message.from_user
         
         if target is None:
-            await message.reply_text(f"❌{LINE}❌\n   **__User not found or deleted!__**\n❌{LINE}❌")
             return
         
         target_id = target.id
         
+        # Remove from normal mute if exists
         remove_mute(chat_id, target_id)
+        
+        # Save to revoke database
         save_revoke(chat_id, target_id)
         
-        user_mention = f"[{target.first_name}](tg://user?id={target_id})"
-        admin_mention = f"[{message.from_user.first_name}](tg://user?id={message.from_user.id})"
+        # Delete the command message silently
+        try:
+            await message.delete()
+        except:
+            pass
         
-        time = get_current_time()
-        date = get_current_date()
-        
-        msg_text = REVOKE_MSGS[0].format(
-            user=user_mention,
-            admin=admin_mention,
-            time=time,
-            date=date
-        )
-        
-        msg_text += f"\n\n🔇 ʀᴇᴠᴏᴋᴇ 🚫 ᴅᴇʟᴇᴛᴇ 🗑️"
-        
-        video = get_random_video()
-        if video and os.path.exists(video["path"]):
-            await app.send_video(chat_id, video["path"], caption=msg_text, supports_streaming=True)
-        else:
-            await app.send_message(chat_id, msg_text)
-        
-        logger.info(f"🔇 REVOKED: {target.first_name}")
+        logger.info(f"🔇 REVOKED: {target.first_name} (Silent)")
         
     except Exception as e:
         logger.error(f"❌ Revoke error: {e}")
-        await message.reply_text(f"❌ **__Error:__** {str(e)}")
 
 # ========== UNREVOKE MUTE (OWNER ONLY) ==========
 @app.on_message(filters.group & filters.command("unrevokemute"))
@@ -1209,8 +1202,34 @@ async def unrevoke_user(client, message: Message):
         logger.error(f"❌ Unrevoke error: {e}")
         await message.reply_text(f"❌ **__Error:__** {str(e)}")
 
+# ========== REVOKED USER LIST ==========
+@app.on_message(filters.group & filters.command("revokemutelist") & filters.user(OWNER_ID))
+async def revoke_list(client, message: Message):
+    try:
+        chat_id = message.chat.id
+        
+        revoked_users = get_revoked_users(chat_id)
+        
+        if not revoked_users:
+            await message.reply_text(f"📭{LINE}📭\n   **__No revoked users!__**\n📭{LINE}📭")
+            return
+        
+        text = f"🔇 **__Revoked Users__**\n\n"
+        for user_id in revoked_users:
+            try:
+                user = await app.get_users(user_id)
+                text += f"• {user.first_name} (`{user_id}`)\n"
+            except:
+                text += f"• Unknown User (`{user_id}`)\n"
+        
+        await message.reply_text(text)
+        
+    except Exception as e:
+        logger.error(f"❌ Revoke list error: {e}")
+        await message.reply_text(f"❌ **__Error:__** {str(e)}")
+
 # ========== AUTO UNMUTE ==========
-async def auto_unmute(chat_id, user_id, user_name, until_time, value, unit):
+async def auto_unmute(chat_id, user_id, user_name, until_time):
     try:
         now = datetime.now()
         wait_seconds = (until_time - now).total_seconds()
@@ -1219,8 +1238,7 @@ async def auto_unmute(chat_id, user_id, user_name, until_time, value, unit):
             wait_seconds = 0
         
         if wait_seconds > 0:
-            duration_str = format_duration(value, unit)
-            logger.info(f"⏳ Auto-unmute in {wait_seconds} seconds for {user_name} (Duration: {duration_str})")
+            logger.info(f"⏳ Auto-unmute in {wait_seconds} seconds for {user_name}")
             await asyncio.sleep(wait_seconds)
         
         # Check if revoked - if revoked, don't unmute
@@ -1356,8 +1374,9 @@ async def start_command(client, message):
 🔇 **__MUTE SYSTEM__**
 • `/tmkc 1s-60s/1m-60m/1w-3w/1d-30d` - **__ᴛᴇᴍᴘ__**
 • `/tbur` - **__ᴜɴᴍᴜᴛᴇ__**
-• `/revokemute @user` - **__ʀᴇᴠᴏᴋᴇ__**
-• `/unrevokemute @user` - **__ᴜɴʀᴇᴠᴏᴋᴇ__**
+• `/revokemute ` - **__ʀᴇᴠᴏᴋᴇ (Silent)__**
+• `/unrevokemute ` - **__ᴜɴʀᴇᴠᴏᴋᴇ__**
+• `/revokemutelist` - **__ʀᴇᴠᴏᴋᴇᴅ ʟɪsᴛ__**
 
 📊 **__/stats__** - **__sᴛᴀᴛs__**
 
