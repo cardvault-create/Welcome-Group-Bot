@@ -834,21 +834,18 @@ async def is_user_in_group(chat_id, user_id):
 # ========== GET USER FROM ID OR USERNAME ==========
 async def get_user_from_input(client, input_str, chat_id):
     try:
-        # Check if it's a numeric ID
         if input_str.isdigit():
             user_id = int(input_str)
             try:
                 user = await client.get_users(user_id)
                 return user
             except:
-                # Check if user is in group
                 try:
                     member = await client.get_chat_member(chat_id, user_id)
                     return member.user
                 except:
                     return None
         else:
-            # Try to get by username (remove @ if present)
             username = input_str.replace("@", "")
             try:
                 user = await client.get_users(username)
@@ -980,13 +977,14 @@ async def service_handler(client, message: Message):
     except Exception as e:
         logger.error(f"❌ Error in service_handler: {e}")
 
-# ========== MUTE COMMAND ==========
+# ========== 🔴 MUTE COMMAND (ADMIN + OWNER) ==========
 @app.on_message(filters.group & filters.command("tmkc"))
 async def mute_user(client, message: Message):
     try:
         chat_id = message.chat.id
         user_id = message.from_user.id
         
+        # Check if user is revoked - delete command silently
         if is_revoked(chat_id, user_id):
             try:
                 await message.delete()
@@ -994,7 +992,8 @@ async def mute_user(client, message: Message):
                 pass
             return
         
-        if not is_owner(user_id):
+        # 🔴 FIX: Check if user is ADMIN or OWNER
+        if not await is_admin(chat_id, user_id) and not is_owner(user_id):
             await message.reply_text(REVOKED_ERROR_MSG, reply_markup=get_owner_button())
             return
         
@@ -1010,10 +1009,12 @@ async def mute_user(client, message: Message):
         
         target_id = target.id
         
+        # Check if target is OWNER
         if target_id == OWNER_ID:
             await message.reply_text(OWNER_ERROR_MSG, reply_markup=get_owner_button())
             return
         
+        # Check if target is ADMIN
         if await is_admin(chat_id, target_id):
             await message.reply_text(ADMIN_ERROR_MSG, reply_markup=get_owner_button())
             return
@@ -1024,14 +1025,14 @@ async def mute_user(client, message: Message):
         
         parts = message.text.split()
         if len(parts) < 2:
-            await message.reply_text(f"❌{LINE}❌\n   **__/tmkc 30-60s/1m-60m/1w-3w/1d-30d__**\n❌{LINE}❌")
+            await message.reply_text(f"❌{LINE}❌\n   **__/tmkc 30s-60s/1m-60m/1w-3w/1d-30d__**\n❌{LINE}❌")
             return
         
         time_str = parts[1]
         value, unit = parse_time(time_str)
         
         if value is None:
-            await message.reply_text(f"❌{LINE}❌\n   **__Invalid time!__**\n   Use: 30-60s / 1m-60m / 1w-3w / 1d-30d\n❌{LINE}❌")
+            await message.reply_text(f"❌{LINE}❌\n   **__Invalid time!__**\n   Use: 30s-60s / 1m-60m / 1w-3w / 1d-30d\n❌{LINE}❌")
             return
         
         delta = timedelta(**{f"{unit}s": value})
@@ -1084,19 +1085,20 @@ async def mute_user(client, message: Message):
             await app.send_message(chat_id, msg_text)
         
         asyncio.create_task(auto_unmute(chat_id, target_id, target.first_name, until_time))
-        logger.info(f"🔇 MUTED: {target.first_name} for {duration}")
+        logger.info(f"🔇 MUTED: {target.first_name} for {duration} by {message.from_user.first_name}")
         
     except Exception as e:
         logger.error(f"❌ Mute error: {e}")
         await message.reply_text(f"❌ **__Error:__** {str(e)}")
 
-# ========== UNMUTE COMMAND (OWNER ONLY) ==========
+# ========== 🔴 UNMUTE COMMAND (ADMIN + OWNER) ==========
 @app.on_message(filters.group & filters.command("tbur"))
 async def unmute_user(client, message: Message):
     try:
         chat_id = message.chat.id
         user_id = message.from_user.id
         
+        # Check if user is revoked - delete command silently
         if is_revoked(chat_id, user_id):
             try:
                 await message.delete()
@@ -1104,7 +1106,8 @@ async def unmute_user(client, message: Message):
                 pass
             return
         
-        if not is_owner(user_id):
+        # 🔴 FIX: Check if user is ADMIN or OWNER
+        if not await is_admin(chat_id, user_id) and not is_owner(user_id):
             await message.reply_text(REVOKED_ERROR_MSG, reply_markup=get_owner_button())
             return
         
@@ -1162,7 +1165,7 @@ async def unmute_user(client, message: Message):
         else:
             await app.send_message(chat_id, msg_text)
         
-        logger.info(f"🔊 UNMUTED: {target.first_name}")
+        logger.info(f"🔊 UNMUTED: {target.first_name} by {message.from_user.first_name}")
         
     except Exception as e:
         logger.error(f"❌ Unmute error: {e}")
@@ -1224,7 +1227,7 @@ async def revoke_user(client, message: Message):
     except Exception as e:
         logger.error(f"❌ Revoke error: {e}")
 
-# ========== UNREVOKE MUTE (OWNER ONLY) - WITH ID SUPPORT ==========
+# ========== UNREVOKE MUTE (OWNER ONLY) ==========
 @app.on_message(filters.group & filters.command("unrevokemute"))
 async def unrevoke_user(client, message: Message):
     try:
@@ -1242,13 +1245,11 @@ async def unrevoke_user(client, message: Message):
         target = None
         target_id = None
         
-        # Check if reply to a user
         if message.reply_to_message:
             target = message.reply_to_message.from_user
             if target:
                 target_id = target.id
         
-        # If no reply, check for ID or username in command
         if target is None:
             parts = message.text.split()
             if len(parts) >= 2:
@@ -1257,19 +1258,16 @@ async def unrevoke_user(client, message: Message):
                 if target:
                     target_id = target.id
         
-        # If still no target, show error
         if target is None or target_id is None:
             await message.reply_text(f"❌{LINE}❌\n   **__Reply to a user or provide ID/Username!__**\n   **__Usage: /unrevokemute 123456789__**\n❌{LINE}❌")
             return
         
-        # Check if user is revoked
         if not remove_revoke(chat_id, target_id):
             await message.reply_text(f"❌{LINE}❌\n   **__User is not revoked!__**\n❌{LINE}❌")
             return
         
         remove_mute(chat_id, target_id)
         
-        # Unrestrict user
         try:
             await app.restrict_chat_member(
                 chat_id=chat_id,
