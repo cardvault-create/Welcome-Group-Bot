@@ -41,7 +41,7 @@ used_video_ids = []
 # ========== ERROR MESSAGES WITH BUTTON ==========
 def get_owner_button():
     return InlineKeyboardMarkup([
-        [InlineKeyboardButton("📩 Contact Father", url=f"https://t.me/{OWNER_USERNAME}")]
+        [InlineKeyboardButton(" ✾ ☆ .•°Contact-Father°˳˳˳!!♡🇵🇹", url=f"https://t.me/{OWNER_USERNAME}")]
     ])
 
 OWNER_ERROR_MSG = f"""❌{LINE}❌
