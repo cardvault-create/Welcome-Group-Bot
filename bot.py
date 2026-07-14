@@ -38,7 +38,7 @@ LINE_BIG = "━━━━━━━━━━━━━━━━━━━━━━"
 # ========== USED VIDEOS TRACKING ==========
 used_video_ids = []
 
-# ========== ERROR MESSAGES WITH BUTTON ==========
+# ========== ERROR MESSAGES ==========
 def get_owner_button():
     return InlineKeyboardMarkup([
         [InlineKeyboardButton(" ✾ ☆ .•°Contact-Father°˳˳˳!!♡🇵🇹", url=f"https://t.me/{OWNER_USERNAME}")]
@@ -106,23 +106,17 @@ def save_video(video_path):
 
 def get_random_video():
     global used_video_ids
-    
     videos = load_videos()
     if not videos:
         return None
-    
     available = [v for v in videos if v["id"] not in used_video_ids]
-    
     if not available:
         used_video_ids.clear()
         available = videos
-    
     video = random.choice(available)
     used_video_ids.append(video["id"])
-    
     if len(used_video_ids) > 20:
         used_video_ids = used_video_ids[-10:]
-    
     return video
 
 def get_video_count():
@@ -186,7 +180,6 @@ def toggle_group(group_id):
         return groups[str(group_id)]["enabled"]
     return False
 
-# ========== MUTE DATABASE ==========
 def load_mutes():
     try:
         if os.path.exists(MUTE_DB):
@@ -237,7 +230,6 @@ def get_mute_until(group_id, user_id):
         return mutes[key]
     return None
 
-# ========== REVOKE DATABASE ==========
 def load_revoke():
     try:
         if os.path.exists(REVOKE_DB):
@@ -281,7 +273,6 @@ def get_revoked_users(group_id):
             pass
     return users
 
-# ========== TIME FUNCTIONS ==========
 def get_current_time():
     return datetime.now(IST).strftime("%I:%M:%S %p")
 
@@ -801,25 +792,24 @@ REVOKE_MSGS = [
 
 # ========== BOT CREATE ==========
 print("🔧 Creating bot...")
-
-app = Client(
-    "premium_bot",
-    api_id=API_ID,
-    api_hash=API_HASH,
-    bot_token=BOT_TOKEN
-)
-
+app = Client("premium_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 print("✅ Bot created!")
 
-# ========== OWNER CHECK ==========
+# ========== CHECK FUNCTIONS ==========
 def is_owner(user_id):
     return user_id == OWNER_ID
 
-# ========== 🔴 SIRF YAHI CHANGE KIYA HAI - ADMIN CHECK ==========
 async def is_admin_or_creator(chat_id, user_id):
     try:
         member = await app.get_chat_member(chat_id, user_id)
         return member.status in ["administrator", "creator"]
+    except:
+        return False
+
+async def is_user_in_group(chat_id, user_id):
+    try:
+        member = await app.get_chat_member(chat_id, user_id)
+        return member is not None
     except:
         return False
 
@@ -828,16 +818,8 @@ async def send_notification(chat_id, user_mention, msg_template, extra=None):
     try:
         time = get_current_time()
         date = get_current_date()
-        
-        msg_text = msg_template.format(
-            user=user_mention,
-            time=time,
-            date=date,
-            **(extra or {})
-        )
-        
+        msg_text = msg_template.format(user=user_mention, time=time, date=date, **(extra or {}))
         msg_text += f"\n\n✨ ᴘʀᴇᴍɪᴜᴍ 💎 ᴜᴘᴅᴀᴛᴇ 👑 ʙʏ 💫 ʙᴏᴛ"
-        
         video = get_random_video()
         if video and os.path.exists(video["path"]):
             await app.send_video(chat_id, video["path"], caption=msg_text, supports_streaming=True)
@@ -852,16 +834,13 @@ async def add_group_from_group(client, message: Message):
     try:
         chat_id = message.chat.id
         chat_name = message.chat.title or f"Group {chat_id}"
-
         try:
             await message.delete()
         except:
             pass
-        
         groups = load_groups()
         if str(chat_id) in groups:
-            sent = await message.reply_text(
-                f"""✅{LINE}✅
+            sent = await message.reply_text(f"""✅{LINE}✅
    ⚠️ **__𝗔𝗟𝗥𝗘𝗔𝗗𝗬 𝗔𝗗𝗗𝗘𝗗!__** ⚠️
 ✅{LINE}✅
 
@@ -873,17 +852,14 @@ async def add_group_from_group(client, message: Message):
 
 {LINE}
 🌌 **__𝗣𝗥𝗘𝗠𝗜𝗨𝗠 𝗔𝗖𝗧𝗜𝗩𝗘__** 🌌
-{LINE}"""
-            )
+{LINE}""")
             await asyncio.sleep(5)
             try:
                 await sent.delete()
             except:
                 pass
             return
-        
         save_group(chat_id, chat_name)
-        
         confirm_text = f"""✅{LINE}✅
    🎯 **__𝗚𝗥𝗢𝗨𝗣 𝗔𝗗𝗗𝗘𝗗!__** 🎯
 ✅{LINE}✅
@@ -900,17 +876,13 @@ async def add_group_from_group(client, message: Message):
 {LINE}
 🌌 **__𝗣𝗥𝗘𝗠𝗜𝗨𝗠 𝗘𝗡𝗔𝗕𝗟𝗘𝗗__** 🌌
 {LINE}"""
-
         sent_msg = await message.reply_text(confirm_text)
-        
         await asyncio.sleep(5)
         try:
             await sent_msg.delete()
         except:
             pass
-        
         logger.info(f"✅ Group auto-added: {chat_name}")
-        
     except Exception as e:
         logger.error(f"❌ Error in addgroup: {e}")
 
@@ -921,7 +893,6 @@ async def service_handler(client, message: Message):
         chat_id = message.chat.id
         if not is_group_enabled(chat_id):
             return
-        
         if message.new_chat_members:
             for user in message.new_chat_members:
                 if user.is_bot:
@@ -929,7 +900,6 @@ async def service_handler(client, message: Message):
                 mention = f"[{user.first_name}](tg://user?id={user.id})"
                 await send_notification(chat_id, mention, random.choice(JOIN_MSGS))
                 logger.info(f"👤 JOIN: {user.first_name}")
-        
         elif message.left_chat_member:
             user = message.left_chat_member
             if user.is_bot:
@@ -941,75 +911,71 @@ async def service_handler(client, message: Message):
             else:
                 await send_notification(chat_id, mention, random.choice(LEFT_MSGS))
                 logger.info(f"🚶 LEFT: {user.first_name}")
-                
     except Exception as e:
         logger.error(f"❌ Error in service_handler: {e}")
 
-# ========== 🔴 SIRF YAHI CHANGE KIYA - ADMIN + OWNER CHECK ==========
+# ========== 🔴 MUTE COMMAND ==========
 @app.on_message(filters.group & filters.command("tmkc"))
 async def mute_user(client, message: Message):
     try:
         chat_id = message.chat.id
         user_id = message.from_user.id
-        
-        # Check if user is revoked - delete command silently
+
         if is_revoked(chat_id, user_id):
             try:
                 await message.delete()
             except:
                 pass
             return
-        
-        # 🔴 CHANGE: Admin + Owner can use
+
         if not await is_admin_or_creator(chat_id, user_id) and not is_owner(user_id):
             await message.reply_text(USER_ERROR_MSG, reply_markup=get_owner_button())
             return
-        
+
         if not message.reply_to_message:
             await message.reply_text(f"❌{LINE}❌\n   **__Reply to a user!__**\n❌{LINE}❌")
             return
-        
+
         target = message.reply_to_message.from_user
-        
+
+        # 🔴 FIX: Check if target exists
         if target is None:
             await message.reply_text(f"❌{LINE}❌\n   **__User not found or deleted!__**\n❌{LINE}❌")
             return
-        
+
         target_id = target.id
-        
-        # Check if target is OWNER
+
         if target_id == OWNER_ID:
             await message.reply_text(OWNER_ERROR_MSG, reply_markup=get_owner_button())
             return
-        
-        # Check if target is ADMIN or CREATOR
+
         if await is_admin_or_creator(chat_id, target_id):
             await message.reply_text(ADMIN_ERROR_MSG, reply_markup=get_owner_button())
             return
-        
+
         if not await is_user_in_group(chat_id, target_id):
             await message.reply_text(f"❌{LINE}❌\n   **__User is not in this group!__**\n❌{LINE}❌")
             return
-        
+
         parts = message.text.split()
         if len(parts) < 2:
             await message.reply_text(f"❌{LINE}❌\n   **__/tmkc 30s-60s/1m-60m/1w-3w/1d-30d__**\n❌{LINE}❌")
             return
-        
+
         time_str = parts[1]
         value, unit = parse_time(time_str)
-        
+
         if value is None:
             await message.reply_text(f"❌{LINE}❌\n   **__Invalid time!__**\n   Use: 30s-60s / 1m-60m / 1w-3w / 1d-30d\n❌{LINE}❌")
             return
-        
+
         delta = timedelta(**{f"{unit}s": value})
         until_time = datetime.now() + delta
         until_str = until_time.isoformat()
-        
+
         remove_revoke(chat_id, target_id)
         save_mute(chat_id, target_id, until_str)
-        
+
         try:
             await app.restrict_chat_member(
                 chat_id=chat_id,
@@ -1026,15 +992,15 @@ async def mute_user(client, message: Message):
             remove_mute(chat_id, target_id)
             await message.reply_text(f"❌{LINE}❌\n   **__Group Admin Not Mute!__**\n❌{LINE}❌")
             return
-        
+
         admin_mention = f"[{message.from_user.first_name}](tg://user?id={message.from_user.id})"
         user_mention = f"[{target.first_name}](tg://user?id={target_id})"
         duration = format_duration(value, unit)
         unmute_time = get_unmute_time(until_str)
-        
+
         time = get_current_time()
         date = get_current_date()
-        
+
         msg_text = MUTE_MSGS[0].format(
             user=user_mention,
             duration=duration,
@@ -1043,60 +1009,58 @@ async def mute_user(client, message: Message):
             time=time,
             date=date
         )
-        
         msg_text += f"\n\n🔇 ᴍᴜᴛᴇ 🤐 ᴀᴄᴛɪᴏɴ ⛔️"
-        
+
         video = get_random_video()
         if video and os.path.exists(video["path"]):
             await app.send_video(chat_id, video["path"], caption=msg_text, supports_streaming=True)
         else:
             await app.send_message(chat_id, msg_text)
-        
+
         asyncio.create_task(auto_unmute(chat_id, target_id, target.first_name, until_time))
         logger.info(f"🔇 MUTED: {target.first_name} for {duration} by {message.from_user.first_name}")
-        
+
     except Exception as e:
         logger.error(f"❌ Mute error: {e}")
         await message.reply_text(f"❌ **__Error:__** {str(e)}")
 
-# ========== 🔴 SIRF YAHI CHANGE KIYA - ADMIN + OWNER CHECK ==========
+# ========== 🔴 UNMUTE COMMAND ==========
 @app.on_message(filters.group & filters.command("tbur"))
 async def unmute_user(client, message: Message):
     try:
         chat_id = message.chat.id
         user_id = message.from_user.id
-        
-        # Check if user is revoked - delete command silently
+
         if is_revoked(chat_id, user_id):
             try:
                 await message.delete()
             except:
                 pass
             return
-        
-        # 🔴 CHANGE: Admin + Owner can use
+
         if not await is_admin_or_creator(chat_id, user_id) and not is_owner(user_id):
             await message.reply_text(USER_ERROR_MSG, reply_markup=get_owner_button())
             return
-        
+
         if not message.reply_to_message:
             await message.reply_text(f"❌{LINE}❌\n   **__Reply to a user!__**\n❌{LINE}❌")
             return
-        
+
         target = message.reply_to_message.from_user
-        
+
+        # 🔴 FIX: Check if target exists
         if target is None:
             await message.reply_text(f"❌{LINE}❌\n   **__User not found or deleted!__**\n❌{LINE}❌")
             return
-        
+
         target_id = target.id
-        
+
         if not is_muted(chat_id, target_id):
             await message.reply_text(f"❌{LINE}❌\n   **__User is not muted!__**\n❌{LINE}❌")
             return
-        
+
         remove_mute(chat_id, target_id)
-        
+
         if not is_revoked(chat_id, target_id):
             try:
                 await app.restrict_chat_member(
@@ -1111,30 +1075,29 @@ async def unmute_user(client, message: Message):
                 )
             except:
                 pass
-        
+
         user_mention = f"[{target.first_name}](tg://user?id={target_id})"
         admin_mention = f"[{message.from_user.first_name}](tg://user?id={message.from_user.id})"
-        
+
         time = get_current_time()
         date = get_current_date()
-        
+
         msg_text = MUTE_MSGS[1].format(
             user=user_mention,
             admin=admin_mention,
             time=time,
             date=date
         )
-        
         msg_text += f"\n\n🔊 ᴜɴᴍᴜᴛᴇ 🎉 ᴀᴄᴛɪᴏɴ ✅"
-        
+
         video = get_random_video()
         if video and os.path.exists(video["path"]):
             await app.send_video(chat_id, video["path"], caption=msg_text, supports_streaming=True)
         else:
             await app.send_message(chat_id, msg_text)
-        
+
         logger.info(f"🔊 UNMUTED: {target.first_name} by {message.from_user.first_name}")
-        
+
     except Exception as e:
         logger.error(f"❌ Unmute error: {e}")
         await message.reply_text(f"❌ **__Error:__** {str(e)}")
@@ -1146,52 +1109,51 @@ async def revoke_user(client, message: Message):
         if not is_owner(message.from_user.id):
             await message.reply_text(OWNER_ERROR_MSG, reply_markup=get_owner_button())
             return
-        
+
         chat_id = message.chat.id
-        
+
         try:
             await message.delete()
         except:
             pass
-        
+
         if not message.reply_to_message:
             await message.reply_text(f"❌{LINE}❌\n   **__Reply to a user!__**\n❌{LINE}❌")
             return
-        
+
         target = message.reply_to_message.from_user
-        
+
         if target is None:
             await message.reply_text(f"❌{LINE}❌\n   **__User not found or deleted!__**\n❌{LINE}❌")
             return
-        
+
         target_id = target.id
-        
+
         remove_mute(chat_id, target_id)
         save_revoke(chat_id, target_id)
-        
+
         user_mention = f"[{target.first_name}](tg://user?id={target_id})"
         admin_mention = f"[{message.from_user.first_name}](tg://user?id={message.from_user.id})"
-        
+
         time = get_current_time()
         date = get_current_date()
-        
+
         msg_text = REVOKE_MSGS[0].format(
             user=user_mention,
             admin=admin_mention,
             time=time,
             date=date
         )
-        
         msg_text += f"\n\n🔇 ʀᴇᴠᴏᴋᴇ 🚫 ᴅᴇʟᴇᴛᴇ 🗑️"
-        
+
         video = get_random_video()
         if video and os.path.exists(video["path"]):
             await app.send_video(chat_id, video["path"], caption=msg_text, supports_streaming=True)
         else:
             await app.send_message(chat_id, msg_text)
-        
+
         logger.info(f"🔇 REVOKED: {target.first_name}")
-        
+
     except Exception as e:
         logger.error(f"❌ Revoke error: {e}")
 
@@ -1202,22 +1164,22 @@ async def unrevoke_user(client, message: Message):
         if not is_owner(message.from_user.id):
             await message.reply_text(OWNER_ERROR_MSG, reply_markup=get_owner_button())
             return
-        
+
         chat_id = message.chat.id
-        
+
         try:
             await message.delete()
         except:
             pass
-        
+
         target = None
         target_id = None
-        
+
         if message.reply_to_message:
             target = message.reply_to_message.from_user
             if target:
                 target_id = target.id
-        
+
         if target is None:
             parts = message.text.split()
             if len(parts) >= 2:
@@ -1239,17 +1201,17 @@ async def unrevoke_user(client, message: Message):
                             pass
                 except:
                     pass
-        
+
         if target is None or target_id is None:
             await message.reply_text(f"❌{LINE}❌\n   **__Reply to a user or provide ID/Username!__**\n   **__Usage: /unrevokemute 123456789__**\n❌{LINE}❌")
             return
-        
+
         if not remove_revoke(chat_id, target_id):
             await message.reply_text(f"❌{LINE}❌\n   **__User is not revoked!__**\n❌{LINE}❌")
             return
-        
+
         remove_mute(chat_id, target_id)
-        
+
         try:
             await app.restrict_chat_member(
                 chat_id=chat_id,
@@ -1263,30 +1225,29 @@ async def unrevoke_user(client, message: Message):
             )
         except:
             pass
-        
+
         user_mention = f"[{target.first_name}](tg://user?id={target_id})"
         admin_mention = f"[{message.from_user.first_name}](tg://user?id={message.from_user.id})"
-        
+
         time = get_current_time()
         date = get_current_date()
-        
+
         msg_text = REVOKE_MSGS[1].format(
             user=user_mention,
             admin=admin_mention,
             time=time,
             date=date
         )
-        
         msg_text += f"\n\n🔊 ᴜɴʀᴇᴠᴏᴋᴇ ✅ ʀᴇsᴛᴏʀᴇ 🎉"
-        
+
         video = get_random_video()
         if video and os.path.exists(video["path"]):
             await app.send_video(chat_id, video["path"], caption=msg_text, supports_streaming=True)
         else:
             await app.send_message(chat_id, msg_text)
-        
+
         logger.info(f"🔊 UNREVOKED: {target.first_name} (ID: {target_id})")
-        
+
     except Exception as e:
         logger.error(f"❌ Unrevoke error: {e}")
         await message.reply_text(f"❌ **__Error:__** {str(e)}")
@@ -1296,18 +1257,14 @@ async def unrevoke_user(client, message: Message):
 async def revoke_list(client, message: Message):
     try:
         chat_id = message.chat.id
-        
         try:
             await message.delete()
         except:
             pass
-        
         revoked_users = get_revoked_users(chat_id)
-        
         if not revoked_users:
             await message.reply_text(f"📭{LINE}📭\n   **__No revoked users!__**\n📭{LINE}📭")
             return
-        
         text = f"🔇 **__Revoked Users__**\n\n{LINE}\n"
         for user_id in revoked_users:
             try:
@@ -1316,9 +1273,7 @@ async def revoke_list(client, message: Message):
             except:
                 text += f"• Unknown User (`{user_id}`)\n"
         text += f"\n{LINE}"
-        
         await message.reply_text(text)
-        
     except Exception as e:
         logger.error(f"❌ Revoke list error: {e}")
         await message.reply_text(f"❌ **__Error:__** {str(e)}")
@@ -1328,19 +1283,14 @@ async def auto_unmute(chat_id, user_id, user_name, until_time):
     try:
         now = datetime.now()
         wait_seconds = (until_time - now).total_seconds()
-        
         if wait_seconds < 0:
             wait_seconds = 0
-        
         logger.info(f"⏳ Auto-unmute: {user_name} will unmute in {wait_seconds} seconds")
-        
         if wait_seconds > 0:
             await asyncio.sleep(wait_seconds)
-        
         if is_revoked(chat_id, user_id):
             logger.info(f"🔇 User {user_name} is revoked, skipping auto-unmute")
             return
-        
         is_restricted = False
         try:
             member = await app.get_chat_member(chat_id, user_id)
@@ -1349,9 +1299,7 @@ async def auto_unmute(chat_id, user_id, user_name, until_time):
                 logger.info(f"🔊 User {user_name} is still restricted")
         except Exception as e:
             logger.info(f"ℹ️ Could not check user status: {e}")
-        
         remove_mute(chat_id, user_id)
-        
         if is_restricted:
             try:
                 await app.restrict_chat_member(
@@ -1369,19 +1317,11 @@ async def auto_unmute(chat_id, user_id, user_name, until_time):
                 logger.error(f"❌ Auto-unmute restrict error: {e}")
         else:
             logger.info(f"ℹ️ User {user_name} is already unmuted, but sending notification anyway")
-        
         user_mention = f"[{user_name}](tg://user?id={user_id})"
         time = get_current_time()
         date = get_current_date()
-        
-        msg_text = MUTE_MSGS[2].format(
-            user=user_mention,
-            time=time,
-            date=date
-        )
-        
+        msg_text = MUTE_MSGS[2].format(user=user_mention, time=time, date=date)
         msg_text += f"\n\n🔊 ᴀᴜᴛᴏ 🤖 ᴜɴᴍᴜᴛᴇ ✅"
-        
         video = get_random_video()
         if video and os.path.exists(video["path"]):
             try:
@@ -1392,9 +1332,7 @@ async def auto_unmute(chat_id, user_id, user_name, until_time):
                 await app.send_message(chat_id, msg_text)
         else:
             await app.send_message(chat_id, msg_text)
-        
         logger.info(f"🔊 AUTO UNMUTED: {user_name}")
-            
     except asyncio.CancelledError:
         logger.info(f"⏹️ Auto-unmute cancelled for {user_name}")
     except Exception as e:
@@ -1415,16 +1353,13 @@ async def delete_revoked_messages(client, message: Message):
     try:
         chat_id = message.chat.id
         user_id = message.from_user.id
-        
         if is_revoked(chat_id, user_id):
             await message.delete()
             logger.info(f"🗑️ Deleted message from revoked user: {message.from_user.first_name}")
             return
-        
         if is_muted(chat_id, user_id):
             await message.delete()
             logger.info(f"🗑️ Deleted message from muted user: {message.from_user.first_name}")
-            
     except Exception as e:
         logger.error(f"❌ Delete message error: {e}")
 
@@ -1441,7 +1376,6 @@ async def start_command(client, message):
             reply_markup=get_owner_button()
         )
         return
-    
     await message.reply_text(
         f"""💎{LINE}💎
 ┏{LINE}┓
@@ -1635,35 +1569,27 @@ async def stats_cmd(client, message):
 {LINE_BIG}"""
     await message.reply_text(text)
 
-# ========== ADD is_user_in_group FUNCTION ==========
-async def is_user_in_group(chat_id, user_id):
-    try:
-        member = await app.get_chat_member(chat_id, user_id)
-        return member is not None
-    except:
-        return False
-
 # ========== RUN ==========
 if __name__ == "__main__":
     print("\n" + "="*40)
     print("🚀 PREMIUM BOT STARTING...")
     print("🔇 MUTE SYSTEM ACTIVE")
     print("="*40 + "\n")
-    
+
     for db in [VIDEO_DB, GROUPS_DB, MUTE_DB, REVOKE_DB]:
         if not os.path.exists(db):
             with open(db, "w") as f:
                 json.dump({} if db != VIDEO_DB else [], f)
-    
+
     os.makedirs("downloads", exist_ok=True)
-    
+
     print(f"📹 Videos: {get_video_count()}")
     print(f"👥 Groups: {len(get_all_groups())}")
     print("\n" + "="*40)
     print("🤖 BOT IS RUNNING!")
     print("🔇 MUTE SYSTEM ACTIVE!")
     print("="*40 + "\n")
-    
+
     try:
         app.run()
     except Exception as e:
