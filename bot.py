@@ -134,9 +134,12 @@ video_app = Client(
 
 print("✅ Bots created!")
 
-# ========== MAIN BOT HANDLERS ==========
+# ========== 🔴 HANDLERS - APP START HONE SE PEHLE REGISTER ==========
+
+# ---------- MAIN BOT HANDLERS ----------
 @main_app.on_message(filters.command("start") & filters.private)
 async def main_start(client, message):
+    logger.info(f"📩 Received /start from {message.from_user.first_name}")
     await message.reply_text(
         f"""🌟 **ᴘʀᴇᴍɪᴜᴍ ɢʀᴏᴜᴘ ʙᴏᴛ** 🌟
 
@@ -155,6 +158,13 @@ async def main_start(client, message):
 💎 **ᴘʀᴇᴍɪᴜᴍ** ʙᴏᴛ 💎"""
     )
 
+# ---------- TEST COMMAND ----------
+@main_app.on_message(filters.command("ping") & filters.private)
+async def ping_command(client, message):
+    logger.info(f"📩 Received /ping from {message.from_user.first_name}")
+    await message.reply_text("🏓 **Pong!** Bot is alive!")
+
+# ---------- JOIN/LEFT/BAN HANDLER ----------
 async def send_premium_notification(chat_id, user_mention, message_template):
     try:
         msg_text = message_template.format(user=user_mention)
@@ -204,9 +214,10 @@ async def member_update_handler(client, update: ChatMemberUpdated):
     except Exception as e:
         logger.error(f"❌ Error: {e}")
 
-# ========== VIDEO BOT HANDLERS ==========
+# ---------- VIDEO BOT HANDLERS ----------
 @video_app.on_message(filters.command("start") & filters.private)
 async def video_start(client, message):
+    logger.info(f"📩 Video bot /start from {message.from_user.first_name}")
     await message.reply_text(
         f"""📹 **ᴠɪᴅᴇᴏ sᴛᴏʀᴀɢᴇ ʙᴏᴛ** 🎬
 
@@ -230,6 +241,11 @@ async def video_start(client, message):
 
 💎 **ᴘʀᴇᴍɪᴜᴍ** sᴛᴏʀᴀɢᴇ 💎"""
     )
+
+@video_app.on_message(filters.command("ping") & filters.private)
+async def video_ping(client, message):
+    logger.info(f"📩 Video bot /ping from {message.from_user.first_name}")
+    await message.reply_text("🏓 **Pong!** Video bot is alive!")
 
 @video_app.on_message(filters.command("save") & filters.private)
 async def save_video_command(client, message):
@@ -359,11 +375,10 @@ async def main():
     os.makedirs("downloads", exist_ok=True)
     
     try:
-        # Start main bot
+        # 🔴 IMPORTANT: Pehle start karo, fir handlers already registered hain
         await main_app.start()
         logger.info("✅ Main bot started!")
         
-        # Start video bot
         await video_app.start()
         logger.info("✅ Video bot started!")
         
@@ -382,6 +397,7 @@ async def main():
         print("✅ BOTS ARE RUNNING!")
         print(f"🤖 Main Bot: @{me.username}")
         print("📝 Send /start to your bot to test")
+        print("📝 Send /ping to check if bot is alive")
         print("="*50 + "\n")
         
         # Keep running
