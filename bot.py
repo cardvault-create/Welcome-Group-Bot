@@ -32,8 +32,8 @@ REVOKE_DB = "revoke.json"
 IST = pytz.timezone('Asia/Kolkata')
 
 # ========== LINE SIZES ==========
-LINE = "━━━━━━━━━━━━━━━━━"          # 15 dashes - normal lines
-LINE_BIG = "━━━━━━━━━━━━━━━━━━━━━━━"  # 23 dashes - date lines
+LINE = "━━━━━━━━━━━━━━"                    # 15 dashes
+LINE_BIG = "━━━━━━━━━━━━━━━━━━━━━━━"       # 23 dashes
 
 # ========== DATABASE FUNCTIONS ==========
 def load_videos():
@@ -720,9 +720,8 @@ async def send_notification(chat_id, user_mention, msg_template, extra=None):
             **(extra or {})
         )
         
-        emojis = ["🔥", "✨", "💎", "🌟", "🎉", "🚀", "👑", "💫"]
-        footer = random.sample(emojis, 4)
-        msg_text += f"\n\n{footer[0]} ᴘʀᴇᴍɪᴜᴍ {footer[1]} ᴜᴘᴅᴀᴛᴇ {footer[2]} ʙʏ {footer[3]} ʙᴏᴛ"
+        # Premium footer - EXACTLY as you specified
+        msg_text += f"\n\n✨ ᴘʀᴇᴍɪᴜᴍ 💎 ᴜᴘᴅᴀᴛᴇ 👑 ʙʏ 💫 ʙᴏᴛ"
         
         video = get_random_video()
         if video and os.path.exists(video["path"]):
@@ -730,7 +729,7 @@ async def send_notification(chat_id, user_mention, msg_template, extra=None):
         else:
             await app.send_message(chat_id, msg_text)
     except Exception as e:
-        logger.error(f"❌ Error: {e}")
+        logger.error(f"❌ Error in send_notification: {e}")
 
 # ========== GROUP AUTO-ADD ==========
 @app.on_message(filters.group & filters.command("addgroup"))
@@ -799,7 +798,7 @@ async def add_group_from_group(client, message: Message):
         logger.info(f"✅ Group auto-added: {chat_name}")
         
     except Exception as e:
-        logger.error(f"❌ Error: {e}")
+        logger.error(f"❌ Error in addgroup: {e}")
 
 # ========== SERVICE MESSAGES ==========
 @app.on_message(filters.group & filters.service)
@@ -830,7 +829,7 @@ async def service_handler(client, message: Message):
                 logger.info(f"🚶 LEFT: {user.first_name}")
                 
     except Exception as e:
-        logger.error(f"❌ Error: {e}")
+        logger.error(f"❌ Error in service_handler: {e}")
 
 # ========== MUTE COMMAND ==========
 @app.on_message(filters.group & filters.command("tmkc"))
@@ -849,8 +848,10 @@ async def mute_user(client, message: Message):
             return
         
         target = message.reply_to_message.from_user
+        
+        # 🔴 FIX: Check if target exists
         if target is None:
-            await message.reply_text(f"❌{LINE}❌\n   **__User not found!__**\n❌{LINE}❌")
+            await message.reply_text(f"❌{LINE}❌\n   **__User not found or deleted!__**\n❌{LINE}❌")
             return
         
         target_id = target.id
@@ -921,8 +922,7 @@ async def mute_user(client, message: Message):
             date=date
         )
         
-        emojis = ["🔇", "🤐", "⛔️"]
-        msg_text += f"\n\n{emojis[0]} ᴍᴜᴛᴇ {emojis[1]} ᴀᴄᴛɪᴏɴ {emojis[2]}"
+        msg_text += f"\n\n🔇 ᴍᴜᴛᴇ 🤐 ᴀᴄᴛɪᴏɴ ⛔️"
         
         video = get_random_video()
         if video and os.path.exists(video["path"]):
@@ -952,8 +952,10 @@ async def permanent_mute(client, message: Message):
             return
         
         target = message.reply_to_message.from_user
+        
+        # 🔴 FIX: Check if target exists
         if target is None:
-            await message.reply_text(f"❌{LINE}❌\n   **__User not found!__**\n❌{LINE}❌")
+            await message.reply_text(f"❌{LINE}❌\n   **__User not found or deleted!__**\n❌{LINE}❌")
             return
         
         target_id = target.id
@@ -993,8 +995,7 @@ async def permanent_mute(client, message: Message):
             date=date
         )
         
-        emojis = ["🔇", "⛔️", "🚫"]
-        msg_text += f"\n\n{emojis[0]} ᴘᴇʀᴍᴀɴᴇɴᴛ {emojis[1]} ᴍᴜᴛᴇ {emojis[2]}"
+        msg_text += f"\n\n🔇 ᴘᴇʀᴍᴀɴᴇɴᴛ ⛔️ ᴍᴜᴛᴇ 🚫"
         
         video = get_random_video()
         if video and os.path.exists(video["path"]):
@@ -1023,8 +1024,10 @@ async def unmute_user(client, message: Message):
             return
         
         target = message.reply_to_message.from_user
+        
+        # 🔴 FIX: Check if target exists
         if target is None:
-            await message.reply_text(f"❌{LINE}❌\n   **__User not found!__**\n❌{LINE}❌")
+            await message.reply_text(f"❌{LINE}❌\n   **__User not found or deleted!__**\n❌{LINE}❌")
             return
         
         target_id = target.id
@@ -1062,8 +1065,7 @@ async def unmute_user(client, message: Message):
             date=date
         )
         
-        emojis = ["🔊", "🎉", "✅"]
-        msg_text += f"\n\n{emojis[0]} ᴜɴᴍᴜᴛᴇ {emojis[1]} ᴀᴄᴛɪᴏɴ {emojis[2]}"
+        msg_text += f"\n\n🔊 ᴜɴᴍᴜᴛᴇ 🎉 ᴀᴄᴛɪᴏɴ ✅"
         
         video = get_random_video()
         if video and os.path.exists(video["path"]):
@@ -1117,8 +1119,7 @@ async def auto_unmute(chat_id, user_id, user_name, until_time):
                 date=date
             )
             
-            emojis = ["🔊", "🤖", "✅"]
-            msg_text += f"\n\n{emojis[0]} ᴀᴜᴛᴏ {emojis[1]} ᴜɴᴍᴜᴛᴇ {emojis[2]}"
+            msg_text += f"\n\n🔊 ᴀᴜᴛᴏ 🤖 ᴜɴᴍᴜᴛᴇ ✅"
             
             video = get_random_video()
             if video and os.path.exists(video["path"]):
