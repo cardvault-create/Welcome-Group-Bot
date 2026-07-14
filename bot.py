@@ -262,28 +262,8 @@ def get_current_date():
 def get_unmute_time(until_str):
     try:
         until_time = datetime.fromisoformat(until_str)
-        # Convert to IST
         until_time_ist = until_time.astimezone(IST)
         return until_time_ist.strftime("%I:%M:%S %p")
-    except:
-        return "Permanent"
-
-def get_remaining_time(until_str):
-    try:
-        until_time = datetime.fromisoformat(until_str)
-        now = datetime.now()
-        remaining = until_time - now
-        if remaining.total_seconds() < 0:
-            return "Expired"
-        seconds = int(remaining.total_seconds())
-        if seconds < 60:
-            return f"{seconds} seconds"
-        elif seconds < 3600:
-            return f"{seconds//60} minutes"
-        elif seconds < 86400:
-            return f"{seconds//3600} hours"
-        else:
-            return f"{seconds//86400} days"
     except:
         return "Permanent"
 
@@ -951,7 +931,6 @@ async def mute_user(client, message: Message):
         chat_id = message.chat.id
         user_id = message.from_user.id
         
-        # Check if user is revoked - delete command silently
         if is_revoked(chat_id, user_id):
             try:
                 await message.delete()
@@ -1063,7 +1042,6 @@ async def unmute_user(client, message: Message):
         chat_id = message.chat.id
         user_id = message.from_user.id
         
-        # Check if user is revoked - delete command silently
         if is_revoked(chat_id, user_id):
             try:
                 await message.delete()
@@ -1145,7 +1123,6 @@ async def revoke_user(client, message: Message):
         
         chat_id = message.chat.id
         
-        # Delete command message first
         try:
             await message.delete()
         except:
@@ -1163,10 +1140,7 @@ async def revoke_user(client, message: Message):
         
         target_id = target.id
         
-        # Remove from normal mute if exists
         remove_mute(chat_id, target_id)
-        
-        # Save to revoke database
         save_revoke(chat_id, target_id)
         
         user_mention = f"[{target.first_name}](tg://user?id={target_id})"
@@ -1205,7 +1179,6 @@ async def unrevoke_user(client, message: Message):
         
         chat_id = message.chat.id
         
-        # Delete command message first
         try:
             await message.delete()
         except:
@@ -1276,7 +1249,6 @@ async def revoke_list(client, message: Message):
     try:
         chat_id = message.chat.id
         
-        # Delete command message first
         try:
             await message.delete()
         except:
@@ -1303,7 +1275,7 @@ async def revoke_list(client, message: Message):
         logger.error(f"❌ Revoke list error: {e}")
         await message.reply_text(f"❌ **__Error:__** {str(e)}")
 
-# ========== AUTO UNMUTE ==========
+# ========== 🔴 FIXED AUTO UNMUTE ==========
 async def auto_unmute(chat_id, user_id, user_name, until_time):
     try:
         now = datetime.now()
@@ -1312,20 +1284,37 @@ async def auto_unmute(chat_id, user_id, user_name, until_time):
         if wait_seconds < 0:
             wait_seconds = 0
         
+        logger.info(f"⏳ Auto-unmute: {user_name} will unmute in {wait_seconds} seconds")
+        
         if wait_seconds > 0:
-            logger.info(f"⏳ Auto-unmute in {wait_seconds} seconds for {user_name}")
             await asyncio.sleep(wait_seconds)
         
-        # Check if revoked - if revoked, don't unmute
+        # 🔴 FIX 1: Check if revoked
         if is_revoked(chat_id, user_id):
-            logger.info(f"🔇 User {user_name} is revoked, not auto-unmuting")
+            logger.info(f"🔇 User {user_name} is revoked, skipping auto-unmute")
+            # Still try to send notification that user is revoked
+            user_mention = f"[{user_name}](tg://user?id={user_id})"
+            time = get_current_time()
+            date = get_current_date()
+            msg_text = f"🔇 {LINE} 🔇\n   **__User is revoked!__**\n   Messages will be deleted!\n{LINE}"
+            await app.send_message(chat_id, msg_text)
             return
         
-        # Check if still muted
-        if is_muted(chat_id, user_id):
-            remove_mute(chat_id, user_id)
-            
-            # Restore all permissions
+        # 🔴 FIX 2: Check if already unmuted by checking permissions
+        is_restricted = False
+        try:
+            member = await app.get_chat_member(chat_id, user_id)
+            if member.status == "restricted" and not member.can_send_messages:
+                is_restricted = True
+                logger.info(f"🔊 User {user_name} is still restricted")
+        except Exception as e:
+            logger.info(f"ℹ️ Could not check user status: {e}")
+        
+        # 🔴 FIX 3: ALWAYS try to remove from database
+        remove_mute(chat_id, user_id)
+        
+        # 🔴 FIX 4: ALWAYS try to unrestrict if restricted
+        if is_restricted:
             try:
                 await app.restrict_chat_member(
                     chat_id=chat_id,
@@ -1340,39 +1329,50 @@ async def auto_unmute(chat_id, user_id, user_name, until_time):
                 logger.info(f"🔊 Auto-unmuted: {user_name}")
             except Exception as e:
                 logger.error(f"❌ Auto-unmute restrict error: {e}")
-            
-            # Send auto-unmute notification with video
-            user_mention = f"[{user_name}](tg://user?id={user_id})"
-            time = get_current_time()
-            date = get_current_date()
-            
-            msg_text = MUTE_MSGS[2].format(
-                user=user_mention,
-                time=time,
-                date=date
-            )
-            
-            msg_text += f"\n\n🔊 ᴀᴜᴛᴏ 🤖 ᴜɴᴍᴜᴛᴇ ✅"
-            
-            video = get_random_video()
-            if video and os.path.exists(video["path"]):
-                try:
-                    await app.send_video(chat_id, video["path"], caption=msg_text, supports_streaming=True)
-                    logger.info(f"📹 Auto-unmute video sent for {user_name}")
-                except Exception as e:
-                    logger.error(f"❌ Auto-unmute video error: {e}")
-                    await app.send_message(chat_id, msg_text)
-            else:
-                await app.send_message(chat_id, msg_text)
-            
-            logger.info(f"🔊 AUTO UNMUTED: {user_name}")
+                # Still send notification even if restrict fails
         else:
-            logger.info(f"ℹ️ User {user_name} is already unmuted")
+            logger.info(f"ℹ️ User {user_name} is already unmuted, but sending notification anyway")
+        
+        # 🔴 FIX 5: ALWAYS send notification with video
+        user_mention = f"[{user_name}](tg://user?id={user_id})"
+        time = get_current_time()
+        date = get_current_date()
+        
+        msg_text = MUTE_MSGS[2].format(
+            user=user_mention,
+            time=time,
+            date=date
+        )
+        
+        msg_text += f"\n\n🔊 ᴀᴜᴛᴏ 🤖 ᴜɴᴍᴜᴛᴇ ✅"
+        
+        video = get_random_video()
+        if video and os.path.exists(video["path"]):
+            try:
+                await app.send_video(chat_id, video["path"], caption=msg_text, supports_streaming=True)
+                logger.info(f"📹 Auto-unmute video sent for {user_name}")
+            except Exception as e:
+                logger.error(f"❌ Auto-unmute video error: {e}")
+                await app.send_message(chat_id, msg_text)
+        else:
+            await app.send_message(chat_id, msg_text)
+        
+        logger.info(f"🔊 AUTO UNMUTED: {user_name}")
             
     except asyncio.CancelledError:
         logger.info(f"⏹️ Auto-unmute cancelled for {user_name}")
     except Exception as e:
         logger.error(f"❌ Auto unmute error: {e}")
+        # 🔴 FIX 6: Try to send notification even if error
+        try:
+            user_mention = f"[{user_name}](tg://user?id={user_id})"
+            time = get_current_time()
+            date = get_current_date()
+            msg_text = MUTE_MSGS[2].format(user=user_mention, time=time, date=date)
+            msg_text += f"\n\n🔊 ᴀᴜᴛᴏ 🤖 ᴜɴᴍᴜᴛᴇ ✅"
+            await app.send_message(chat_id, msg_text)
+        except:
+            pass
 
 # ========== DELETE REVOKED USER MESSAGES ==========
 @app.on_message(filters.group & (filters.text | filters.photo | filters.video | filters.document | filters.sticker | filters.voice | filters.video_note | filters.audio | filters.animation))
@@ -1449,8 +1449,8 @@ async def start_command(client, message):
 🔇 **__MUTE SYSTEM__**
 • `/tmkc 1s-60s/1m-60m/1w-3w/1d-30d` - **__ᴛᴇᴍᴘ__**
 • `/tbur` - **__ᴜɴᴍᴜᴛᴇ__**
-• `/revokemute @user` - **__ʀᴇᴠᴏᴋᴇ__**
-• `/unrevokemute @user` - **__ᴜɴʀᴇᴠᴏᴋᴇ__**
+• `/revokemute ` - **__ʀᴇᴠᴏᴋᴇ__**
+• `/unrevokemute ` - **__ᴜɴʀᴇᴠᴏᴋᴇ__**
 • `/revokemutelist` - **__ʀᴇᴠᴏᴋᴇᴅ ʟɪsᴛ__**
 
 📊 **__/stats__** - **__sᴛᴀᴛs__**
