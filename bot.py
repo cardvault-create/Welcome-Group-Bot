@@ -53,26 +53,29 @@ def save_video(video_path):
     logger.info(f"✅ Video #{video_id} saved")
     return video_id
 
-def get_unused_video():
+def get_random_video():
+    """Har baar random video - used flag reset karke"""
     videos = load_videos()
     if not videos:
         return None
     
-    unused = [v for v in videos if not v.get("used", False)]
-    if unused:
-        video = random.choice(unused)
-        for v in videos:
-            if v["id"] == video["id"]:
-                v["used"] = True
-        with open(VIDEO_DB, "w") as f:
-            json.dump(videos, f, indent=2)
-        return video
-    
+    # Sab videos ko available karo
     for v in videos:
         v["used"] = False
     with open(VIDEO_DB, "w") as f:
         json.dump(videos, f, indent=2)
-    return random.choice(videos)
+    
+    # Random video select karo
+    video = random.choice(videos)
+    
+    # Mark as used (but will reset next time)
+    for v in videos:
+        if v["id"] == video["id"]:
+            v["used"] = True
+    with open(VIDEO_DB, "w") as f:
+        json.dump(videos, f, indent=2)
+    
+    return video
 
 def get_video_count():
     return len(load_videos())
@@ -133,77 +136,192 @@ def toggle_group(group_id):
         return groups[str(group_id)]["enabled"]
     return False
 
-# ========== PREMIUM MESSAGES ==========
+# ========== TIME FUNCTIONS ==========
 def get_current_time():
     return datetime.now(IST).strftime("%I:%M:%S %p")
 
 def get_current_date():
     return datetime.now(IST).strftime("%B %d, %Y")
 
+# ========== 🔥 PREMIUM STYLED MESSAGES ==========
+
+# ---------- JOIN MESSAGES ----------
 JOIN_MESSAGES = [
-    """🌟━━━━━━━━━━━━━━━━━━━━━━━🌟
-┏━━━━━━━━━━━━━━━━━━━━━━━┓
-┃ ✨ **{user}** ✨
-┃ 🎯 **JOINED** the group!
-┗━━━━━━━━━━━━━━━━━━━━━━━┛
-🌟━━━━━━━━━━━━━━━━━━━━━━━🌟
+    """🌟━━━━━━━━━━━━━━━━━━━━━━━━━━━━━🌟
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃    ✨ **__{user}__** ✨    
+┃    🎯 **__JOINED__** ᴛʜᴇ ɢʀᴏᴜᴘ!    
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+🌟━━━━━━━━━━━━━━━━━━━━━━━━━━━━━🌟
 
-🎉 **ᴡᴇʟᴄᴏᴍᴇ** ᴛᴏ ᴛʜᴇ **ᴘʀᴇᴍɪᴜᴍ** ғᴀᴍɪʟʏ! 🏆
-💎 **ʏᴏᴜ'ʀᴇ** ᴛʜᴇ **ʙᴇsᴛ** ᴀᴅᴅɪᴛɪᴏɴ ᴛᴏᴅᴀʏ! 🔥
+🎉 **__ᴡᴇʟᴄᴏᴍᴇ__** ᴛᴏ ᴛʜᴇ **__ᴘʀᴇᴍɪᴜᴍ__** ғᴀᴍɪʟʏ! 🏆
+💎 **__ʏᴏᴜ'ʀᴇ__** ᴛʜᴇ **__ʙᴇsᴛ__** ᴀᴅᴅɪᴛɪᴏɴ ᴛᴏᴅᴀʏ! 🔥
+🌈 **__ɢʟᴀᴅ__** ᴛᴏ ʜᴀᴠᴇ ʏᴏᴜ **__ʜᴇʀᴇ__**! 💫
 
-━━━━━━━━━━━━━━━━━━━━━━━
-🕐 **ᴛɪᴍᴇ:** `{time}`
-📅 **ᴅᴀᴛᴇ:** `{date}`
-━━━━━━━━━━━━━━━━━━━━━━━""",
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🕐 **__ᴛɪᴍᴇ:__** `{time}`
+📅 **__ᴅᴀᴛᴇ:__** `{date}`
+📊 **__ᴛᴏᴛᴀʟ ᴍᴇᴍʙᴇʀs:__** `{members}`
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━""",
 
-    """💫━━━━━━━━━━━━━━━━━━━━━━━💫
-╔━━━━━━━━━━━━━━━━━━━━━━━╗
-║ 🚀 **{user}** 🚀
-║ 👑 **ENTERED** the arena!
-╚━━━━━━━━━━━━━━━━━━━━━━━╝
-💫━━━━━━━━━━━━━━━━━━━━━━━💫
+    """💫━━━━━━━━━━━━━━━━━━━━━━━━━━━━━💫
+╔━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╗
+║    🚀 **__{user}__** 🚀    
+║    👑 **__ENTERED__** ᴛʜᴇ ᴀʀᴇɴᴀ!    
+╚━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╝
+💫━━━━━━━━━━━━━━━━━━━━━━━━━━━━━💫
 
-🌟 **ɴᴇᴡ ᴘʟᴀʏᴇʀ** ɪɴ ᴛʜᴇ ʜᴏᴜsᴇ! 🎮
-⚡️ **ᴡᴇ'ʀᴇ** sᴏ **ᴇxᴄɪᴛᴇᴅ** ᴛᴏ ʜᴀᴠᴇ ʏᴏᴜ! 💫
+🌟 **__ɴᴇᴡ ᴘʟᴀʏᴇʀ__** ɪɴ ᴛʜᴇ ʜᴏᴜsᴇ! 🎮
+⚡️ **__ᴡᴇ'ʀᴇ__** sᴏ **__ᴇxᴄɪᴛᴇᴅ__** ᴛᴏ ʜᴀᴠᴇ ʏᴏᴜ! 💫
+🔥 **__ʟᴇᴛ's__** ᴍᴀᴋᴇ **__ᴍᴇᴍᴏʀɪᴇs__** ᴛᴏɢᴇᴛʜᴇʀ! 🎊
 
-━━━━━━━━━━━━━━━━━━━━━━━
-🕐 **ᴛɪᴍᴇ:** `{time}`
-📅 **ᴅᴀᴛᴇ:** `{date}`
-━━━━━━━━━━━━━━━━━━━━━━━"""
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🕐 **__ᴛɪᴍᴇ:__** `{time}`
+📅 **__ᴅᴀᴛᴇ:__** `{date}`
+📊 **__ᴛᴏᴛᴀʟ ᴍᴇᴍʙᴇʀs:__** `{members}`
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━""",
+
+    """🔥━━━━━━━━━━━━━━━━━━━━━━━━━━━━━🔥
+╔━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╗
+║    ⭐️ **__{user}__** ⭐️    
+║    🎊 **__WELCOME__** ᴀʙᴏᴀʀᴅ!    
+╚━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╝
+🔥━━━━━━━━━━━━━━━━━━━━━━━━━━━━━🔥
+
+🌈 **__ɴᴇᴡ__** ᴍᴇᴍʙᴇʀ **__ᴜɴʟᴏᴄᴋᴇᴅ__**! 🗝️
+💫 **__ᴛʜᴇ__** ғᴀᴍɪʟʏ **__ɢʀᴏᴡs__** ʙʏ ᴏɴᴇ! 🎉
+💎 **__ʏᴏᴜ'ʀᴇ__** ᴀ **__ᴠᴀʟᴜᴀʙʟᴇ__** ᴀᴅᴅɪᴛɪᴏɴ! 🌟
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🕐 **__ᴛɪᴍᴇ:__** `{time}`
+📅 **__ᴅᴀᴛᴇ:__** `{date}`
+📊 **__ᴛᴏᴛᴀʟ ᴍᴇᴍʙᴇʀs:__** `{members}`
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━""",
+
+    """🌈━━━━━━━━━━━━━━━━━━━━━━━━━━━━━🌈
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃    🎇 **__{user}__** 🎇    
+┃    💫 **__JOINED__** ᴛʜᴇ ᴄʀᴇᴡ!    
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+🌈━━━━━━━━━━━━━━━━━━━━━━━━━━━━━🌈
+
+💝 **__ʟᴏᴠᴇ__** ᴛᴏ ʜᴀᴠᴇ ʏᴏᴜ **__ʜᴇʀᴇ__**! 💕
+🎵 **__ʟᴇᴛ's__** ᴍᴀᴋᴇ **__ᴍᴇᴍᴏʀɪᴇs__** ᴛᴏɢᴇᴛʜᴇʀ! 🎶
+🌟 **__ᴛᴏɢᴇᴛʜᴇʀ__** ᴡᴇ ᴀʀᴇ **__sᴛʀᴏɴɢᴇʀ__**! 💪
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🕐 **__ᴛɪᴍᴇ:__** `{time}`
+📅 **__ᴅᴀᴛᴇ:__** `{date}`
+📊 **__ᴛᴏᴛᴀʟ ᴍᴇᴍʙᴇʀs:__** `{members}`
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"""
 ]
 
+# ---------- LEFT MESSAGES ----------
 LEFT_MESSAGES = [
-    """😔━━━━━━━━━━━━━━━━━━━━━━━😔
-┏━━━━━━━━━━━━━━━━━━━━━━━┓
-┃ 💔 **{user}** 💔
-┃ 🚶 **LEFT** the group!
-┗━━━━━━━━━━━━━━━━━━━━━━━┛
-😔━━━━━━━━━━━━━━━━━━━━━━━😔
+    """😔━━━━━━━━━━━━━━━━━━━━━━━━━━━━━😔
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃    💔 **__{user}__** 💔    
+┃    🚶 **__LEFT__** ᴛʜᴇ ɢʀᴏᴜᴘ!    
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+😔━━━━━━━━━━━━━━━━━━━━━━━━━━━━━😔
 
-🕊️ **ᴡᴇ'ʟʟ** ᴍɪss ʏᴏᴜ **ᴅᴇᴀʀ** ғʀɪᴇɴᴅ! 💫
-🌈 **ɢᴏᴏᴅʙʏᴇ** ᴀɴᴅ **ᴛᴀᴋᴇ** ᴄᴀʀᴇ! 🌟
+🕊️ **__ᴡᴇ'ʟʟ__** ᴍɪss ʏᴏᴜ **__ᴅᴇᴀʀ__** ғʀɪᴇɴᴅ! 💫
+🌈 **__ɢᴏᴏᴅʙʏᴇ__** ᴀɴᴅ **__ᴛᴀᴋᴇ__** ᴄᴀʀᴇ! 🌟
+💫 **__ʜᴏᴘᴇ__** ᴛᴏ sᴇᴇ ʏᴏᴜ **__ᴀɢᴀɪɴ__**! 🤞
 
-━━━━━━━━━━━━━━━━━━━━━━━
-🕐 **ᴛɪᴍᴇ:** `{time}`
-📅 **ᴅᴀᴛᴇ:** `{date}`
-━━━━━━━━━━━━━━━━━━━━━━━"""
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🕐 **__ᴛɪᴍᴇ:__** `{time}`
+📅 **__ᴅᴀᴛᴇ:__** `{date}`
+📊 **__ᴛᴏᴛᴀʟ ᴍᴇᴍʙᴇʀs:__** `{members}`
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━""",
+
+    """🌧️━━━━━━━━━━━━━━━━━━━━━━━━━━━━━🌧️
+╔━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╗
+║    👋 **__{user}__** 👋    
+║    🚪 **__EXITED__** ᴛʜᴇ ɢʀᴏᴜᴘ!    
+╚━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╝
+🌧️━━━━━━━━━━━━━━━━━━━━━━━━━━━━━🌧️
+
+😢 **__sᴀᴅ__** ᴛᴏ sᴇᴇ ʏᴏᴜ **__ʟᴇᴀᴠᴇ__**! 💔
+🌟 **__ʏᴏᴜ'ʟʟ__** ʙᴇ **__ᴍɪssᴇᴅ__** ʜᴇʀᴇ! 🥺
+🌈 **__ᴡɪsʜɪɴɢ__** ʏᴏᴜ **__ʙᴇsᴛ__** ғᴏʀ ᴛʜᴇ ғᴜᴛᴜʀᴇ! ✨
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🕐 **__ᴛɪᴍᴇ:__** `{time}`
+📅 **__ᴅᴀᴛᴇ:__** `{date}`
+📊 **__ᴛᴏᴛᴀʟ ᴍᴇᴍʙᴇʀs:__** `{members}`
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━""",
+
+    """🌊━━━━━━━━━━━━━━━━━━━━━━━━━━━━━🌊
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃    💧 **__{user}__** 💧    
+┃    🚣 **__SAILED__** ᴀᴡᴀʏ!    
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+🌊━━━━━━━━━━━━━━━━━━━━━━━━━━━━━🌊
+
+🌅 **__ᴛʜᴇ__** sᴜɴ sᴇᴛs ᴏɴ **__ʏᴏᴜʀ__** ᴅᴇᴘᴀʀᴛᴜʀᴇ! 🌄
+🕊️ **__ᴍᴀʏ__** ʏᴏᴜ **__ғɪɴᴅ__** ᴘᴇᴀᴄᴇ ᴇᴠᴇʀʏᴡʜᴇʀᴇ! ✨
+🌟 **__ᴛʜᴀɴᴋ__** ʏᴏᴜ ғᴏʀ ʙᴇɪɴɢ ᴘᴀʀᴛ ᴏғ ᴛʜɪs **__ғᴀᴍɪʟʏ__**! 💫
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🕐 **__ᴛɪᴍᴇ:__** `{time}`
+📅 **__ᴅᴀᴛᴇ:__** `{date}`
+📊 **__ᴛᴏᴛᴀʟ ᴍᴇᴍʙᴇʀs:__** `{members}`
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"""
 ]
 
+# ---------- BAN MESSAGES ----------
 BAN_MESSAGES = [
-    """🚫━━━━━━━━━━━━━━━━━━━━━━━🚫
-┏━━━━━━━━━━━━━━━━━━━━━━━┓
-┃ ⛔️ **{user}** ⛔️
-┃ 🔨 **BANNED** from group!
-┗━━━━━━━━━━━━━━━━━━━━━━━┛
-🚫━━━━━━━━━━━━━━━━━━━━━━━🚫
+    """🚫━━━━━━━━━━━━━━━━━━━━━━━━━━━━━🚫
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃    ⛔️ **__{user}__** ⛔️    
+┃    🔨 **__BANNED__** ғʀᴏᴍ ɢʀᴏᴜᴘ!    
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+🚫━━━━━━━━━━━━━━━━━━━━━━━━━━━━━🚫
 
-⚖️ **ʀᴜʟᴇs** ᴡᴇʀᴇ **ʙʀᴏᴋᴇɴ**! 🚨
-❌ **ᴀᴄᴛɪᴏɴ** ʜᴀs ʙᴇᴇɴ **ᴛᴀᴋᴇɴ**! 💥
+⚖️ **__ʀᴜʟᴇs__** ᴡᴇʀᴇ **__ʙʀᴏᴋᴇɴ__**! 🚨
+❌ **__ᴀᴄᴛɪᴏɴ__** ʜᴀs ʙᴇᴇɴ **__ᴛᴀᴋᴇɴ__**! 💥
+🛡️ **__ᴛʜᴇ__** ᴄᴏᴍᴍᴜɴɪᴛʏ ɪs **__sᴀғᴇ__** ɴᴏᴡ! 🎯
 
-━━━━━━━━━━━━━━━━━━━━━━━
-🕐 **ᴛɪᴍᴇ:** `{time}`
-📅 **ᴅᴀᴛᴇ:** `{date}`
-━━━━━━━━━━━━━━━━━━━━━━━"""
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🕐 **__ᴛɪᴍᴇ:__** `{time}`
+📅 **__ᴅᴀᴛᴇ:__** `{date}`
+📊 **__ᴛᴏᴛᴀʟ ᴍᴇᴍʙᴇʀs:__** `{members}`
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━""",
+
+    """🔒━━━━━━━━━━━━━━━━━━━━━━━━━━━━━🔒
+╔━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╗
+║    🚷 **__{user}__** 🚷    
+║    🔐 **__PERMANENTLY__** ʙᴀɴɴᴇᴅ!    
+╚━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╝
+🔒━━━━━━━━━━━━━━━━━━━━━━━━━━━━━🔒
+
+⛓️ **__sᴇᴄᴜʀɪᴛʏ__** ᴍᴇᴀsᴜʀᴇs **__ᴀᴄᴛɪᴠᴀᴛᴇᴅ__**! 🛡️
+🗑️ **__ʀᴇᴍᴏᴠᴇᴅ__** ғʀᴏᴍ ᴛʜᴇ **__ᴄᴏᴍᴍᴜɴɪᴛʏ__**! ❌
+💀 **__ɴᴏ__** ᴛᴏʟᴇʀᴀɴᴄᴇ ғᴏʀ **__ʀᴜʟᴇ ʙʀᴇᴀᴋᴇʀs__**! ⚡
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🕐 **__ᴛɪᴍᴇ:__** `{time}`
+📅 **__ᴅᴀᴛᴇ:__** `{date}`
+📊 **__ᴛᴏᴛᴀʟ ᴍᴇᴍʙᴇʀs:__** `{members}`
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━""",
+
+    """⚡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⚡
+╔━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╗
+║    💢 **__{user}__** 💢    
+║    ⚔️ **__BANISHED__** ғᴏʀᴇᴠᴇʀ!    
+╚━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╝
+⚡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⚡
+
+🗡️ **__ᴊᴜsᴛɪᴄᴇ__** ʜᴀs ʙᴇᴇɴ **__sᴇʀᴠᴇᴅ__**! ⚖️
+🛡️ **__ᴛʜᴇ__** ɢʀᴏᴜᴘ ɪs **__sᴀғᴇ__** ᴀɢᴀɪɴ! 🎯
+🌟 **__ʀᴜʟᴇs__** ᴀʀᴇ **__ɴᴏɴ-ɴᴇɢᴏᴛɪᴀʙʟᴇ__**! 💪
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🕐 **__ᴛɪᴍᴇ:__** `{time}`
+📅 **__ᴅᴀᴛᴇ:__** `{date}`
+📊 **__ᴛᴏᴛᴀʟ ᴍᴇᴍʙᴇʀs:__** `{members}`
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"""
 ]
 
 # ========== BOT CREATE ==========
@@ -222,30 +340,44 @@ print("✅ Bot created!")
 def is_owner(user_id):
     return user_id == OWNER_ID
 
+# ========== GET MEMBER COUNT ==========
+async def get_member_count(chat_id):
+    try:
+        chat = await app.get_chat(chat_id)
+        return chat.members_count
+    except:
+        return "?"
+
 # ========== SEND PREMIUM NOTIFICATION ==========
 async def send_premium_notification(chat_id, user_mention, message_template, event_type):
     try:
         time = get_current_time()
         date = get_current_date()
+        members = await get_member_count(chat_id)
         
         msg_text = message_template.format(
             user=user_mention,
             time=time,
-            date=date
+            date=date,
+            members=members
         )
         
-        emojis = ["🔥", "✨", "💎", "🌟", "🎉", "🚀", "👑", "💫"]
-        footer = random.sample(emojis, 3)
-        msg_text += f"\n\n{footer[0]} **ᴘʀᴇᴍɪᴜᴍ** {footer[1]} **ᴜᴘᴅᴀᴛᴇ** {footer[2]}"
+        # Premium footer with random emojis
+        emojis = ["🔥", "✨", "💎", "🌟", "🎉", "🚀", "👑", "💫", "⭐️", "🌈", "⚡️", "💥", "🎊", "🏆", "❤️"]
+        footer = random.sample(emojis, 4)
+        msg_text += f"\n\n{footer[0]} **__ᴘʀᴇᴍɪᴜᴍ__** {footer[1]} **__ᴜᴘᴅᴀᴛᴇ__** {footer[2]} **__ʙʏ__** {footer[3]} **__ʙᴏᴛ__**"
         
-        video_data = get_unused_video()
+        # Get random video - HAR BAAR NAYI VIDEO
+        video_data = get_random_video()
         
         if video_data and os.path.exists(video_data["path"]):
             await app.send_video(
                 chat_id=chat_id,
                 video=video_data["path"],
                 caption=msg_text,
-                supports_streaming=True
+                supports_streaming=True,
+                width=1920,
+                height=1080
             )
             logger.info(f"📹 Video #{video_data['id']} sent to {chat_id}")
         else:
@@ -265,27 +397,29 @@ async def add_group_from_group(client, message: Message):
         save_group(chat_id, chat_name)
         
         # Premium confirmation message
-        confirm_text = f"""✅━━━━━━━━━━━━━━━━━━━━━━━✅
-┏━━━━━━━━━━━━━━━━━━━━━━━┓
-┃ **ɢʀᴏᴜᴘ ᴀᴅᴅᴇᴅ** 🎉
-┗━━━━━━━━━━━━━━━━━━━━━━━┛
-✅━━━━━━━━━━━━━━━━━━━━━━━✅
+        confirm_text = f"""✅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━✅
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃    **__ɢʀᴏᴜᴘ ᴀᴅᴅᴇᴅ__** 🎉    
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+✅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━✅
 
-📛 **ɴᴀᴍᴇ:** `{chat_name}`
-🆔 **ɪᴅ:** `{chat_id}`
-📅 **ᴛɪᴍᴇ:** `{get_current_time()}`
-📆 **ᴅᴀᴛᴇ:** `{get_current_date()}`
+📛 **__ɴᴀᴍᴇ:__** `{chat_name}`
+🆔 **__ɪᴅ:__** `{chat_id}`
+🕐 **__ᴛɪᴍᴇ:__** `{get_current_time()}`
+📅 **__ᴅᴀᴛᴇ:__** `{get_current_date()}`
 
-🌟 **sᴛᴀᴛᴜs:** ✅ ᴀᴄᴛɪᴠᴇ
+🌟 **__sᴛᴀᴛᴜs:__** ✅ **__ᴀᴄᴛɪᴠᴇ__**
 
-━━━━━━━━━━━━━━━━━━━━━━━
-💎 **ᴘʀᴇᴍɪᴜᴍ** ᴇɴᴀʙʟᴇᴅ 💎
-━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💎 **__ᴘʀᴇᴍɪᴜᴍ__** **__ᴇɴᴀʙʟᴇᴅ__** 💎
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-⚡️ **ɴᴏᴡ ᴍᴏɴɪᴛᴏʀɪɴɢ:**
-• 👤 Jᴏɪɴs
-• 🚶 Lᴇᴀᴠᴇs
-• 🚫 Bᴀɴs"""
+⚡️ **__ɴᴏᴡ ᴍᴏɴɪᴛᴏʀɪɴɢ:__**
+• 👤 **__Jᴏɪɴs__** 
+• 🚶 **__Lᴇᴀᴠᴇs__**
+• 🚫 **__Bᴀɴs__**
+
+📹 **__ᴠɪᴅᴇᴏs__** **__ʟᴏᴀᴅᴇᴅ:__** `{get_video_count()}`"""
 
         # Send confirmation
         sent_msg = await message.reply_text(confirm_text)
@@ -294,14 +428,14 @@ async def add_group_from_group(client, message: Message):
         await asyncio.sleep(5)
         try:
             await sent_msg.delete()
-            await message.delete()  # Delete command message too
+            await message.delete()
         except:
             pass
         
         logger.info(f"✅ Group auto-added: {chat_name} ({chat_id})")
         
     except Exception as e:
-        await message.reply_text(f"❌ **ᴇʀʀᴏʀ:** {str(e)}")
+        await message.reply_text(f"❌ **__ᴇʀʀᴏʀ:__** {str(e)}")
         logger.error(f"❌ Error in group add: {e}")
 
 # ========== 🔴 SERVICE MESSAGES HANDLER ==========
@@ -337,9 +471,7 @@ async def service_message_handler(client, message: Message):
             mention = f"[{user.first_name}](tg://user?id={user.id})"
             
             # Check if user was kicked (banned)
-            # In service messages, if someone is banned, the message type is different
             if hasattr(message, 'new_chat_members') and message.new_chat_members is None:
-                # This is a ban/kick
                 await send_premium_notification(
                     chat_id,
                     mention,
@@ -348,7 +480,6 @@ async def service_message_handler(client, message: Message):
                 )
                 logger.info(f"🚫 BANNED: {user.first_name} in {chat_id}")
             else:
-                # Normal left
                 await send_premium_notification(
                     chat_id,
                     mention,
@@ -365,43 +496,43 @@ async def service_message_handler(client, message: Message):
 @app.on_message(filters.command("start") & filters.private)
 async def start_command(client, message):
     if not is_owner(message.from_user.id):
-        await message.reply_text("❌ **ᴜɴᴀᴜᴛʜᴏʀɪᴢᴇᴅ ᴀᴄᴄᴇss!**")
+        await message.reply_text("❌ **__ᴜɴᴀᴜᴛʜᴏʀɪᴢᴇᴅ ᴀᴄᴄᴇss!__**")
         return
     
     await message.reply_text(
-        f"""🌟━━━━━━━━━━━━━━━━━━━━━━━🌟
-┏━━━━━━━━━━━━━━━━━━━━━━━┓
-┃ **ᴘʀᴇᴍɪᴜᴍ ɢʀᴏᴜᴘ ʙᴏᴛ** ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━┛
-🌟━━━━━━━━━━━━━━━━━━━━━━━🌟
+        f"""🌟━━━━━━━━━━━━━━━━━━━━━━━━━━━━━🌟
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃    **__ᴘʀᴇᴍɪᴜᴍ ɢʀᴏᴜᴘ ʙᴏᴛ__**    
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+🌟━━━━━━━━━━━━━━━━━━━━━━━━━━━━━🌟
 
-**ʜᴇʏ** {message.from_user.first_name}! 👋
+**__ʜᴇʏ__** {message.from_user.first_name}! 👋
 
-✅ Bot is **working** properly!
+✅ **__ʙᴏᴛ__** ɪs **__ᴡᴏʀᴋɪɴɢ__** ᴘʀᴏᴘᴇʀʟʏ!
 
-📹 **ᴛᴏᴛᴀʟ ᴠɪᴅᴇᴏs:** `{get_video_count()}`
-👥 **ᴛᴏᴛᴀʟ ɢʀᴏᴜᴘs:** `{len(get_all_groups())}`
+📹 **__ᴛᴏᴛᴀʟ ᴠɪᴅᴇᴏs:__** `{get_video_count()}`
+👥 **__ᴛᴏᴛᴀʟ ɢʀᴏᴜᴘs:__** `{len(get_all_groups())}`
 
-**ᴄᴏᴍᴍᴀɴᴅs:**
-━━━━━━━━━━━━━━━━━━━━━━━
-📹 **ᴠɪᴅᴇᴏ ᴍᴀɴᴀɢᴇᴍᴇɴᴛ**
-• `/addvideo` - ᴀᴅᴅ ᴠɪᴅᴇᴏ
-• `/videos` - ᴠɪᴇᴡ ᴀʟʟ
-• `/delvideo` - ᴅᴇʟᴇᴛᴇ
-• `/clearvideos` - ᴄʟᴇᴀʀ ᴀʟʟ
+**__ᴄᴏᴍᴍᴀɴᴅs:__**
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📹 **__ᴠɪᴅᴇᴏ ᴍᴀɴᴀɢᴇᴍᴇɴᴛ__**
+• `/addvideo` - **__ᴀᴅᴅ__** ᴠɪᴅᴇᴏ
+• `/videos` - **__ᴠɪᴇᴡ__** ᴀʟʟ
+• `/delvideo` - **__ᴅᴇʟᴇᴛᴇ__**
+• `/clearvideos` - **__ᴄʟᴇᴀʀ__** ᴀʟʟ
 
-👥 **ɢʀᴏᴜᴘ ᴍᴀɴᴀɢᴇᴍᴇɴᴛ**
-• `/addgroup` - ᴀᴅᴅ ɢʀᴏᴜᴘ
-• `/groups` - ᴠɪᴇᴡ ᴀʟʟ
-• `/delgroup` - ʀᴇᴍᴏᴠᴇ
-• `/toggle` - ᴇɴᴀʙʟᴇ/ᴅɪsᴀʙʟᴇ
+👥 **__ɢʀᴏᴜᴘ ᴍᴀɴᴀɢᴇᴍᴇɴᴛ__**
+• `/addgroup` - **__ᴀᴅᴅ__** ɢʀᴏᴜᴘ
+• `/groups` - **__ᴠɪᴇᴡ__** ᴀʟʟ
+• `/delgroup` - **__ʀᴇᴍᴏᴠᴇ__**
+• `/toggle` - **__ᴇɴᴀʙʟᴇ/ᴅɪsᴀʙʟᴇ__**
 
-📊 **sᴛᴀᴛɪsᴛɪᴄs**
-• `/stats` - ʙᴏᴛ sᴛᴀᴛs
+📊 **__sᴛᴀᴛɪsᴛɪᴄs__**
+• `/stats` - **__ʙᴏᴛ__** sᴛᴀᴛs
 
-━━━━━━━━━━━━━━━━━━━━━━━
-💎 **ᴘʀᴇᴍɪᴜᴍ** ʙᴏᴛ 💎
-━━━━━━━━━━━━━━━━━━━━━━━"""
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💎 **__ᴘʀᴇᴍɪᴜᴍ__** **__ʙᴏᴛ__** 💎
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"""
     )
 
 @app.on_message(filters.command("addgroup") & filters.private)
@@ -413,8 +544,8 @@ async def add_group_private(client, message):
         parts = message.text.split()
         if len(parts) < 2:
             await message.reply_text(
-                "❌ **ᴜsᴀɢᴇ:** `/addgroup -100123456789`\n\n"
-                "📌 **ᴛɪᴘ:** ɢʀᴏᴜᴘ ᴍᴇɪɴ `/addgroup` ᴛʏᴘᴇ ᴋᴀʀᴏ ᴀᴜᴛᴏ-ᴀᴅᴅ ʜᴏ ɢᴀʏᴇɢᴀ!"
+                "❌ **__ᴜsᴀɢᴇ:__** `/addgroup -100123456789`\n\n"
+                "📌 **__ᴛɪᴘ:__** ɢʀᴏᴜᴘ ᴍᴇɪɴ `/addgroup` ᴛʏᴘᴇ ᴋᴀʀᴏ ᴀᴜᴛᴏ-ᴀᴅᴅ ʜᴏ ɢᴀʏᴇɢᴀ!"
             )
             return
         
@@ -423,12 +554,12 @@ async def add_group_private(client, message):
         
         save_group(group_id, group_name)
         await message.reply_text(
-            f"✅ **ɢʀᴏᴜᴘ ᴀᴅᴅᴇᴅ!** 🎉\n\n"
-            f"📛 **ɴᴀᴍᴇ:** `{group_name}`\n"
-            f"🆔 **ɪᴅ:** `{group_id}`"
+            f"✅ **__ɢʀᴏᴜᴘ ᴀᴅᴅᴇᴅ!__** 🎉\n\n"
+            f"📛 **__ɴᴀᴍᴇ:__** `{group_name}`\n"
+            f"🆔 **__ɪᴅ:__** `{group_id}`"
         )
     except Exception as e:
-        await message.reply_text(f"❌ **ᴇʀʀᴏʀ:** {str(e)}")
+        await message.reply_text(f"❌ **__ᴇʀʀᴏʀ:__** {str(e)}")
 
 @app.on_message(filters.command("groups") & filters.private)
 async def groups_list(client, message):
@@ -437,16 +568,16 @@ async def groups_list(client, message):
     
     groups = get_all_groups()
     if not groups:
-        await message.reply_text("❌ **ɴᴏ ɢʀᴏᴜᴘs ᴀᴅᴅᴇᴅ!**")
+        await message.reply_text("❌ **__ɴᴏ ɢʀᴏᴜᴘs ᴀᴅᴅᴇᴅ!__**")
         return
     
-    text = "👥 **ᴍʏ ɢʀᴏᴜᴘs**\n\n"
-    text += "━━━━━━━━━━━━━━━━━━━━━━━\n"
+    text = "👥 **__ᴍʏ ɢʀᴏᴜᴘs__**\n\n"
+    text += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
     for group_id, data in groups.items():
         status = "✅" if data.get("enabled", True) else "❌"
-        text += f"{status} **{data['name']}**\n"
+        text += f"{status} **__{data['name']}__**\n"
         text += f"   🆔 `{group_id}`\n"
-        text += "━━━━━━━━━━━━━━━━━━━━━━━\n"
+        text += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
     
     await message.reply_text(text)
 
@@ -458,16 +589,16 @@ async def delete_group(client, message):
     try:
         parts = message.text.split()
         if len(parts) != 2:
-            await message.reply_text("❌ **ᴜsᴀɢᴇ:** `/delgroup -100123456789`")
+            await message.reply_text("❌ **__ᴜsᴀɢᴇ:__** `/delgroup -100123456789`")
             return
         
         group_id = int(parts[1])
         if remove_group(group_id):
-            await message.reply_text(f"✅ **ɢʀᴏᴜᴘ ʀᴇᴍᴏᴠᴇᴅ!**")
+            await message.reply_text(f"✅ **__ɢʀᴏᴜᴘ ʀᴇᴍᴏᴠᴇᴅ!__**")
         else:
-            await message.reply_text(f"❌ **ɢʀᴏᴜᴘ ɴᴏᴛ ғᴏᴜɴᴅ!**")
+            await message.reply_text(f"❌ **__ɢʀᴏᴜᴘ ɴᴏᴛ ғᴏᴜɴᴅ!__**")
     except:
-        await message.reply_text("❌ **ɪɴᴠᴀʟɪᴅ ғᴏʀᴍᴀᴛ!**")
+        await message.reply_text("❌ **__ɪɴᴠᴀʟɪᴅ ғᴏʀᴍᴀᴛ!__**")
 
 @app.on_message(filters.command("toggle") & filters.private)
 async def toggle_group_command(client, message):
@@ -477,41 +608,41 @@ async def toggle_group_command(client, message):
     try:
         parts = message.text.split()
         if len(parts) != 2:
-            await message.reply_text("❌ **ᴜsᴀɢᴇ:** `/toggle -100123456789`")
+            await message.reply_text("❌ **__ᴜsᴀɢᴇ:__** `/toggle -100123456789`")
             return
         
         group_id = int(parts[1])
         status = toggle_group(group_id)
         await message.reply_text(
-            f"✅ **ɢʀᴏᴜᴘ ᴛᴏɢɢʟᴇᴅ!**\n\n"
+            f"✅ **__ɢʀᴏᴜᴘ ᴛᴏɢɢʟᴇᴅ!__**\n\n"
             f"🆔 `{group_id}`\n"
-            f"📊 **sᴛᴀᴛᴜs:** {'✅ ᴇɴᴀʙʟᴇᴅ' if status else '❌ ᴅɪsᴀʙʟᴇᴅ'}"
+            f"📊 **__sᴛᴀᴛᴜs:__** {'✅ ᴇɴᴀʙʟᴇᴅ' if status else '❌ ᴅɪsᴀʙʟᴇᴅ'}"
         )
     except:
-        await message.reply_text("❌ **ɪɴᴠᴀʟɪᴅ ғᴏʀᴍᴀᴛ!**")
+        await message.reply_text("❌ **__ɪɴᴠᴀʟɪᴅ ғᴏʀᴍᴀᴛ!__**")
 
 @app.on_message(filters.command("addvideo") & filters.private)
 async def add_video_command(client, message):
     if not is_owner(message.from_user.id):
         return
     
-    status = await message.reply_text("⏳ **ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ...**")
+    status = await message.reply_text("⏳ **__ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ...__**")
     
     try:
         if message.reply_to_message and message.reply_to_message.video:
             video_path = await message.reply_to_message.download()
             video_id = save_video(video_path)
             await status.edit_text(
-                f"✅ **ᴠɪᴅᴇᴏ #`{video_id}` sᴀᴠᴇᴅ!** 🎉\n\n"
-                f"📹 **ᴛᴏᴛᴀʟ:** `{get_video_count()}`"
+                f"✅ **__ᴠɪᴅᴇᴏ #`{video_id}` sᴀᴠᴇᴅ!__** 🎉\n\n"
+                f"📹 **__ᴛᴏᴛᴀʟ:__** `{get_video_count()}`"
             )
         else:
             await status.edit_text(
-                "❌ **ᴘʟᴇᴀsᴇ ʀᴇᴘʟʏ ᴛᴏ ᴀ ᴠɪᴅᴇᴏ!**\n\n"
-                "**ᴜsᴀɢᴇ:** Send video → Reply with `/addvideo`"
+                "❌ **__ᴘʟᴇᴀsᴇ ʀᴇᴘʟʏ ᴛᴏ ᴀ ᴠɪᴅᴇᴏ!__**\n\n"
+                "**__ᴜsᴀɢᴇ:__** Send video → Reply with `/addvideo`"
             )
     except Exception as e:
-        await status.edit_text(f"❌ **ᴇʀʀᴏʀ:** {str(e)}")
+        await status.edit_text(f"❌ **__ᴇʀʀᴏʀ:__** {str(e)}")
 
 @app.on_message(filters.command("videos") & filters.private)
 async def list_videos(client, message):
@@ -520,18 +651,18 @@ async def list_videos(client, message):
     
     videos = load_videos()
     if not videos:
-        await message.reply_text("❌ **ɴᴏ ᴠɪᴅᴇᴏs ғᴏᴜɴᴅ!**")
+        await message.reply_text("❌ **__ɴᴏ ᴠɪᴅᴇᴏs ғᴏᴜɴᴅ!__**")
         return
     
-    text = "🎬 **ᴠɪᴅᴇᴏ ʟɪʙʀᴀʀʏ**\n\n"
-    text += "━━━━━━━━━━━━━━━━━━━━━━━\n"
+    text = "🎬 **__ᴠɪᴅᴇᴏ ʟɪʙʀᴀʀʏ__**\n\n"
+    text += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
     for video in videos:
         used = "✅" if video.get("used", False) else "🔄"
         text += f"{used} **#`{video['id']}`** {video['name']}\n"
         text += f"   🕐 `{video['timestamp'][:16]}`\n"
-        text += "━━━━━━━━━━━━━━━━━━━━━━━\n"
+        text += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
     
-    text += f"\n📹 **ᴛᴏᴛᴀʟ:** `{len(videos)}`"
+    text += f"\n📹 **__ᴛᴏᴛᴀʟ:__** `{len(videos)}`"
     await message.reply_text(text)
 
 @app.on_message(filters.command("delvideo") & filters.private)
@@ -542,16 +673,16 @@ async def delete_video_command(client, message):
     try:
         parts = message.text.split()
         if len(parts) != 2:
-            await message.reply_text("❌ **ᴜsᴀɢᴇ:** `/delvideo 1`")
+            await message.reply_text("❌ **__ᴜsᴀɢᴇ:__** `/delvideo 1`")
             return
         
         video_id = int(parts[1])
         if delete_video_by_id(video_id):
-            await message.reply_text(f"✅ **ᴠɪᴅᴇᴏ #`{video_id}` ᴅᴇʟᴇᴛᴇᴅ!**")
+            await message.reply_text(f"✅ **__ᴠɪᴅᴇᴏ #`{video_id}` ᴅᴇʟᴇᴛᴇᴅ!__**")
         else:
-            await message.reply_text(f"❌ **ᴠɪᴅᴇᴏ #`{video_id}` ɴᴏᴛ ғᴏᴜɴᴅ!**")
+            await message.reply_text(f"❌ **__ᴠɪᴅᴇᴏ #`{video_id}` ɴᴏᴛ ғᴏᴜɴᴅ!__**")
     except:
-        await message.reply_text("❌ **ɪɴᴠᴀʟɪᴅ ғᴏʀᴍᴀᴛ!**")
+        await message.reply_text("❌ **__ɪɴᴠᴀʟɪᴅ ғᴏʀᴍᴀᴛ!__**")
 
 @app.on_message(filters.command("clearvideos") & filters.private)
 async def clear_videos_command(client, message):
@@ -560,7 +691,7 @@ async def clear_videos_command(client, message):
     
     videos = load_videos()
     if not videos:
-        await message.reply_text("❌ **ɴᴏ ᴠɪᴅᴇᴏs ᴛᴏ ᴄʟᴇᴀʀ!**")
+        await message.reply_text("❌ **__ɴᴏ ᴠɪᴅᴇᴏs ᴛᴏ ᴄʟᴇᴀʀ!__**")
         return
     
     for video in videos:
@@ -570,7 +701,7 @@ async def clear_videos_command(client, message):
     with open(VIDEO_DB, "w") as f:
         json.dump([], f)
     
-    await message.reply_text(f"🗑️ **ᴀʟʟ {len(videos)} ᴠɪᴅᴇᴏs ᴄʟᴇᴀʀᴇᴅ!**")
+    await message.reply_text(f"🗑️ **__ᴀʟʟ {len(videos)} ᴠɪᴅᴇᴏs ᴄʟᴇᴀʀᴇᴅ!__**")
 
 @app.on_message(filters.command("stats") & filters.private)
 async def stats_command(client, message):
@@ -589,21 +720,21 @@ async def stats_command(client, message):
     
     groups = get_all_groups()
     
-    text = f"""📊 **ʙᴏᴛ sᴛᴀᴛɪsᴛɪᴄs**
+    text = f"""📊 **__ʙᴏᴛ sᴛᴀᴛɪsᴛɪᴄs__**
 
-━━━━━━━━━━━━━━━━━━━━━━━
-📹 **ᴛᴏᴛᴀʟ ᴠɪᴅᴇᴏs:** `{len(videos)}`
-🔄 **ᴜɴᴜsᴇᴅ:** `{len(videos) - used}`
-✅ **ᴜsᴇᴅ:** `{used}`
-💾 **ᴛᴏᴛᴀʟ sɪᴢᴇ:** `{total_size / (1024*1024):.2f} MB`
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📹 **__ᴛᴏᴛᴀʟ ᴠɪᴅᴇᴏs:__** `{len(videos)}`
+🔄 **__ᴜɴᴜsᴇᴅ:__** `{len(videos) - used}`
+✅ **__ᴜsᴇᴅ:__** `{used}`
+💾 **__ᴛᴏᴛᴀʟ sɪᴢᴇ:__** `{total_size / (1024*1024):.2f} MB`
 
-👥 **ᴛᴏᴛᴀʟ ɢʀᴏᴜᴘs:** `{len(groups)}`
-✅ **ᴇɴᴀʙʟᴇᴅ:** `{sum(1 for g in groups.values() if g.get('enabled', True))}`
+👥 **__ᴛᴏᴛᴀʟ ɢʀᴏᴜᴘs:__** `{len(groups)}`
+✅ **__ᴇɴᴀʙʟᴇᴅ:__** `{sum(1 for g in groups.values() if g.get('enabled', True))}`
 
-⏰ **ᴜᴘᴛɪᴍᴇ:** `{datetime.now(IST).strftime('%B %d, %Y %I:%M %p')}`
-━━━━━━━━━━━━━━━━━━━━━━━
-💎 **ᴘʀᴇᴍɪᴜᴍ** ʙᴏᴛ 💎
-━━━━━━━━━━━━━━━━━━━━━━━"""
+⏰ **__ᴜᴘᴛɪᴍᴇ:__** `{datetime.now(IST).strftime('%B %d, %Y %I:%M %p')}`
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💎 **__ᴘʀᴇᴍɪᴜᴍ__** **__ʙᴏᴛ__** 💎
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"""
     
     await message.reply_text(text)
 
@@ -629,6 +760,7 @@ if __name__ == "__main__":
     print(f"👥 Total groups: {len(get_all_groups())}")
     print("\n" + "="*60)
     print("🤖 BOT IS RUNNING!")
+    print("📌 HAR BAAR NAYI VIDEO AAYEGI!")
     print("="*60 + "\n")
     
     try:
