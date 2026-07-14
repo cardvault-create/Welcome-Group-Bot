@@ -815,14 +815,12 @@ print("✅ Bot created!")
 def is_owner(user_id):
     return user_id == OWNER_ID
 
-# ========== 🔴 FIXED: IS ADMIN OR CREATOR ==========
+# ========== IS ADMIN OR CREATOR ==========
 async def is_admin_or_creator(chat_id, user_id):
     try:
         member = await app.get_chat_member(chat_id, user_id)
-        logger.info(f"🔍 User {user_id} status: {member.status}")
         return member.status in ["administrator", "creator"]
-    except Exception as e:
-        logger.error(f"❌ Admin check error: {e}")
+    except:
         return False
 
 # ========== CHECK IF USER IN GROUP ==========
@@ -994,13 +992,8 @@ async def mute_user(client, message: Message):
                 pass
             return
         
-        # 🔴 FIX: Check if user is ADMIN, CREATOR, or OWNER
-        is_admin_user = await is_admin_or_creator(chat_id, user_id)
-        is_owner_user = is_owner(user_id)
-        
-        logger.info(f"🔍 User {user_id} - Admin: {is_admin_user}, Owner: {is_owner_user}")
-        
-        if not is_admin_user and not is_owner_user:
+        # Check if user is ADMIN, CREATOR, or OWNER
+        if not await is_admin_or_creator(chat_id, user_id) and not is_owner(user_id):
             await message.reply_text(USER_ERROR_MSG, reply_markup=get_owner_button())
             return
         
@@ -1114,13 +1107,8 @@ async def unmute_user(client, message: Message):
                 pass
             return
         
-        # 🔴 FIX: Check if user is ADMIN, CREATOR, or OWNER
-        is_admin_user = await is_admin_or_creator(chat_id, user_id)
-        is_owner_user = is_owner(user_id)
-        
-        logger.info(f"🔍 User {user_id} - Admin: {is_admin_user}, Owner: {is_owner_user}")
-        
-        if not is_admin_user and not is_owner_user:
+        # Check if user is ADMIN, CREATOR, or OWNER
+        if not await is_admin_or_creator(chat_id, user_id) and not is_owner(user_id):
             await message.reply_text(USER_ERROR_MSG, reply_markup=get_owner_button())
             return
         
