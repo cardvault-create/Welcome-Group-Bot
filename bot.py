@@ -33,7 +33,7 @@ IST = pytz.timezone('Asia/Kolkata')
 
 # ========== LINE SIZES ==========
 LINE = "━━━━━━━━━━━━━━━━━"
-LINE_BIG = "━━━━━━━━━━━━━━━━━━━━━━━"
+LINE_BIG = "━━━━━━━━━━━━━━━━━━━━━━"
 
 # ========== DATABASE FUNCTIONS ==========
 def load_videos():
@@ -655,28 +655,28 @@ MUTE_MSGS = [
 {LINE_BIG}"""
 ]
 
-UNMUTE_MSGS = [
-    f"""🔊{LINE}🔊
-   🗣️ {{user}} 🗣️
-   𝐔𝐍𝐌𝐔𝐓𝐄𝐃!
-🔊{LINE}🔊
+REVOKE_MSGS = [
+    f"""🔇{LINE}🔇
+   🚫 {{user}} 🚫
+   𝐑𝐄𝐕𝐎𝐊𝐄𝐃!
+🔇{LINE}🔇
 
-𝐔𝐬𝐞𝐫 𝐡𝐚𝐬 𝐛𝐞𝐞𝐧 𝐮𝐧𝐦𝐮𝐭𝐞𝐝! 🎉
-𝐍𝐨𝐰 𝐭𝐡𝐞𝐲 𝐜𝐚𝐧 𝐬𝐩𝐞𝐚𝐤! 💬
-𝐌𝐮𝐭𝐞 𝐢𝐬 𝐨𝐯𝐞𝐫! ⏰
+𝐔𝐬𝐞𝐫'𝐬 𝐦𝐞𝐬𝐬𝐚𝐠𝐞𝐬 𝐰𝐢𝐥𝐥 𝐛𝐞 𝐝𝐞𝐥𝐞𝐭𝐞𝐝! 🗑️
+𝐀𝐥𝐥 𝐦𝐞𝐬𝐬𝐚𝐠𝐞𝐬 𝐰𝐢𝐥𝐥 𝐛𝐞 𝐚𝐮𝐭𝐨-𝐝𝐞𝐥𝐞𝐭𝐞𝐝! 🤖
+𝐁𝐲: {{admin}} 👑
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
 {LINE_BIG}""",
 
     f"""🔊{LINE}🔊
-   🎉 {{user}} 🎉
-   𝐌𝐔𝐓𝐄 𝐄𝐗𝐏𝐈𝐑𝐄𝐃!
+   ✅ {{user}} ✅
+   𝐔𝐍𝐑𝐄𝐕𝐎𝐊𝐄𝐃!
 🔊{LINE}🔊
 
-𝐀𝐮𝐭𝐨-𝐮𝐧𝐦𝐮𝐭𝐞𝐝! 🤖
-𝐓𝐢𝐦𝐞 𝐢𝐬 𝐮𝐩! ⏰
-𝐖𝐞𝐥𝐜𝐨𝐦𝐞 𝐛𝐚𝐜𝐤! 👋
+𝐔𝐬𝐞𝐫'𝐬 𝐦𝐞𝐬𝐬𝐚𝐠𝐞𝐬 𝐰𝐢𝐥𝐥 𝐧𝐨𝐭 𝐛𝐞 𝐝𝐞𝐥𝐞𝐭𝐞𝐝! 🎉
+𝐍𝐨𝐰 𝐭𝐡𝐞𝐲 𝐜𝐚𝐧 𝐬𝐞𝐧𝐝 𝐦𝐞𝐬𝐬𝐚𝐠𝐞𝐬 𝐧𝐨𝐫𝐦𝐚𝐥𝐥𝐲! 💬
+𝐁𝐲: {{admin}} 👑
 
 {LINE_BIG}
 🕐 {{time}}  •  📅 {{date}}
@@ -861,7 +861,6 @@ async def mute_user(client, message: Message):
         
         target_id = target.id
         
-        # 🔴 CHECK: User group mein hai ya nahi
         if not await is_user_in_group(chat_id, target_id):
             await message.reply_text(f"❌{LINE}❌\n   **__User is not in this group!__**\n❌{LINE}❌")
             return
@@ -899,7 +898,6 @@ async def mute_user(client, message: Message):
         remove_revoke(chat_id, target_id)
         save_mute(chat_id, target_id, until_str)
         
-        # 🔴 TRY-CATCH for restrict error
         try:
             await app.restrict_chat_member(
                 chat_id=chat_id,
@@ -913,9 +911,8 @@ async def mute_user(client, message: Message):
                 until_date=until_time
             )
         except Exception as e:
-            # 🔴 If error, remove mute and show message
             remove_mute(chat_id, target_id)
-            await message.reply_text(f"❌{LINE}❌\n   **__Cannot mute user!__**\n   Make me admin first!\n❌{LINE}❌")
+            await message.reply_text(f"❌{LINE}❌\n   **__Group admin not ban!__**\n   𝐀𝐩𝐧𝐞 𝐚𝐢𝐬𝐞 𝐬𝐞 𝐤𝐚𝐫 𝐝𝐞𝐧𝐚! 🛠️\n❌{LINE}❌")
             return
         
         admin_mention = f"[{message.from_user.first_name}](tg://user?id={message.from_user.id})"
@@ -948,9 +945,9 @@ async def mute_user(client, message: Message):
         logger.error(f"❌ Mute error: {e}")
         await message.reply_text(f"❌ **__Error:__** {str(e)}")
 
-# ========== PERMANENT MUTE (OWNER ONLY) ==========
+# ========== REVOKE MUTE - DELETE MESSAGES ONLY (OWNER ONLY) ==========
 @app.on_message(filters.group & filters.command("revokemute"))
-async def permanent_mute(client, message: Message):
+async def revoke_user(client, message: Message):
     try:
         if not is_owner(message.from_user.id):
             await message.reply_text(f"❌{LINE}❌\n   **__This Command Only For Bot Father!__**\n❌{LINE}❌")
@@ -970,44 +967,26 @@ async def permanent_mute(client, message: Message):
         
         target_id = target.id
         
-        if not await is_user_in_group(chat_id, target_id):
-            await message.reply_text(f"❌{LINE}❌\n   **__User is not in this group!__**\n❌{LINE}❌")
-            return
-        
+        # Remove from normal mute if exists
         remove_mute(chat_id, target_id)
+        
+        # Save to revoke database - ONLY FOR DELETING MESSAGES
         save_revoke(chat_id, target_id)
         
-        try:
-            await app.restrict_chat_member(
-                chat_id=chat_id,
-                user_id=target_id,
-                permissions=ChatPermissions(
-                    can_send_messages=False,
-                    can_send_media_messages=False,
-                    can_send_other_messages=False,
-                    can_add_web_page_previews=False
-                ),
-                until_date=datetime.now() + timedelta(days=365)
-            )
-        except Exception as e:
-            remove_revoke(chat_id, target_id)
-            await message.reply_text(f"❌{LINE}❌\n   **__Cannot mute user!__**\n   Make me admin first!\n❌{LINE}❌")
-            return
-        
-        admin_mention = f"[{message.from_user.first_name}](tg://user?id={message.from_user.id})"
         user_mention = f"[{target.first_name}](tg://user?id={target_id})"
+        admin_mention = f"[{message.from_user.first_name}](tg://user?id={message.from_user.id})"
         
         time = get_current_time()
         date = get_current_date()
         
-        msg_text = MUTE_MSGS[1].format(
+        msg_text = REVOKE_MSGS[0].format(
             user=user_mention,
             admin=admin_mention,
             time=time,
             date=date
         )
         
-        msg_text += f"\n\n🔇 ᴘᴇʀᴍᴀɴᴇɴᴛ ⛔️ ᴍᴜᴛᴇ 🚫"
+        msg_text += f"\n\n🔇 ʀᴇᴠᴏᴋᴇ 🚫 ᴅᴇʟᴇᴛᴇ 🗑️"
         
         video = get_random_video()
         if video and os.path.exists(video["path"]):
@@ -1015,15 +994,15 @@ async def permanent_mute(client, message: Message):
         else:
             await app.send_message(chat_id, msg_text)
         
-        logger.info(f"🔇 PERMANENT MUTE: {target.first_name} by {message.from_user.first_name}")
+        logger.info(f"🔇 REVOKED: {target.first_name} (messages will be deleted) by {message.from_user.first_name}")
         
     except Exception as e:
-        logger.error(f"❌ Permanent mute error: {e}")
+        logger.error(f"❌ Revoke error: {e}")
         await message.reply_text(f"❌ **__Error:__** {str(e)}")
 
-# ========== UNMUTE (OWNER ONLY) ==========
+# ========== UNREVOKE MUTE (OWNER ONLY) ==========
 @app.on_message(filters.group & filters.command("unrevokemute"))
-async def unmute_user(client, message: Message):
+async def unrevoke_user(client, message: Message):
     try:
         if not is_owner(message.from_user.id):
             await message.reply_text(f"❌{LINE}❌\n   **__This Command Only For Bot Father!__**\n❌{LINE}❌")
@@ -1044,37 +1023,25 @@ async def unmute_user(client, message: Message):
         target_id = target.id
         
         if not remove_revoke(chat_id, target_id):
-            await message.reply_text(f"❌{LINE}❌\n   **__User is not permanently muted!__**\n❌{LINE}❌")
+            await message.reply_text(f"❌{LINE}❌\n   **__User is not revoked!__**\n❌{LINE}❌")
             return
         
         remove_mute(chat_id, target_id)
         
-        try:
-            await app.restrict_chat_member(
-                chat_id=chat_id,
-                user_id=target_id,
-                permissions=ChatPermissions(
-                    can_send_messages=True,
-                    can_send_media_messages=True,
-                    can_send_other_messages=True,
-                    can_add_web_page_previews=True
-                )
-            )
-        except:
-            pass
-        
         user_mention = f"[{target.first_name}](tg://user?id={target_id})"
+        admin_mention = f"[{message.from_user.first_name}](tg://user?id={message.from_user.id})"
         
         time = get_current_time()
         date = get_current_date()
         
-        msg_text = UNMUTE_MSGS[0].format(
+        msg_text = REVOKE_MSGS[1].format(
             user=user_mention,
+            admin=admin_mention,
             time=time,
             date=date
         )
         
-        msg_text += f"\n\n🔊 ᴜɴᴍᴜᴛᴇ 🎉 ᴀᴄᴛɪᴏɴ ✅"
+        msg_text += f"\n\n🔊 ᴜɴʀᴇᴠᴏᴋᴇ ✅ ʀᴇsᴛᴏʀᴇ 🎉"
         
         video = get_random_video()
         if video and os.path.exists(video["path"]):
@@ -1082,10 +1049,10 @@ async def unmute_user(client, message: Message):
         else:
             await app.send_message(chat_id, msg_text)
         
-        logger.info(f"🔊 UNMUTED: {target.first_name} by {message.from_user.first_name}")
+        logger.info(f"🔊 UNREVOKED: {target.first_name} by {message.from_user.first_name}")
         
     except Exception as e:
-        logger.error(f"❌ Unmute error: {e}")
+        logger.error(f"❌ Unrevoke error: {e}")
         await message.reply_text(f"❌ **__Error:__** {str(e)}")
 
 # ========== AUTO UNMUTE ==========
@@ -1140,18 +1107,20 @@ async def auto_unmute(chat_id, user_id, user_name, until_time):
     except Exception as e:
         logger.error(f"❌ Auto unmute error: {e}")
 
-# ========== DELETE REVOKED/MUTED USER MESSAGES ==========
+# ========== DELETE REVOKED USER MESSAGES ==========
 @app.on_message(filters.group & filters.text)
 async def delete_revoked_messages(client, message: Message):
     try:
         chat_id = message.chat.id
         user_id = message.from_user.id
         
+        # 🔴 REVOKE = DELETE ALL MESSAGES INSTANTLY
         if is_revoked(chat_id, user_id):
             await message.delete()
             logger.info(f"🗑️ Deleted message from revoked user: {message.from_user.first_name}")
             return
         
+        # Normal mute check
         if is_muted(chat_id, user_id):
             await message.delete()
             logger.info(f"🗑️ Deleted message from muted user: {message.from_user.first_name}")
@@ -1214,8 +1183,8 @@ async def start_command(client, message):
 
 🔇 **__MUTE SYSTEM__**
 • `/tmkc @user 1s/1m/1h/1d` - **__ᴛᴇᴍᴘ__**
-• `/revokemute @user` - **__ᴘᴇʀᴍ__**
-• `/unrevokemute @user` - **__ᴜɴᴍᴜᴛᴇ__**
+• `/revokemute @user` - **__ʀᴇᴠᴏᴋᴇ__**
+• `/unrevokemute @user` - **__ᴜɴʀᴇᴠᴏᴋᴇ__**
 
 📊 **__/stats__** - **__sᴛᴀᴛs__**
 
