@@ -44,12 +44,14 @@ def get_owner_button():
         [InlineKeyboardButton(" ✾ ☆ .•°Contact-Father°˳˳˳!!♡🇵🇹", url=f"https://t.me/{OWNER_USERNAME}")]
     ])
 
-# 🔴 FIXED: Better error messages
 REPLY_ERROR_MSG = f"""❌{LINE}❌
+   Reply to a user!
+❌{LINE}❌"""
+
+USER_ERROR_MSG = f"""❌{LINE}❌
   ☆ 
-  .•° <b>Please reply to a user!</b> ❗
-  ✾ <b>Use: /tmkc @username 30s-60s</b>
-  ✾ <b>Or reply to user's message</b>
+  .•° <b>Hey! You can't use this command!</b> ❗
+  ✾ <b>You are not a group admin, You can't do Anything!</b> °˳˳˳!!♡🇵🇹
 ❌{LINE}❌"""
 
 ADMIN_TARGET_ERROR = f"""❌{LINE}❌
@@ -63,12 +65,6 @@ OWNER_TARGET_ERROR = f"""❌{LINE}❌
   ☆ 
   .•° <b>Hey! You can't use this command!</b> ❗
   ✾ <b>This User Is A Bot Father, You Can't Do Anything!</b> °˳˳˳!!♡🇵🇹
-❌{LINE}❌"""
-
-USER_ERROR_MSG = f"""❌{LINE}❌
-  ☆ 
-  .•° <b>Hey! You can't use this command!</b> ❗
-  ✾ <b>You are not a group admin, You can't do Anything!</b> °˳˳˳!!♡🇵🇹
 ❌{LINE}❌"""
 
 UNAUTHORIZED_MSG = f"""❌{LINE}❌
@@ -923,7 +919,7 @@ async def service_handler(client, message: Message):
     except Exception as e:
         logger.error(f"❌ Error in service_handler: {e}")
 
-# ========== 🔴 MUTE COMMAND ==========
+# ========== 🔴 MUTE COMMAND - FIXED ==========
 @app.on_message(filters.group & filters.command("tmkc"))
 async def mute_user(client, message: Message):
     try:
@@ -938,19 +934,18 @@ async def mute_user(client, message: Message):
                 pass
             return
 
-        # Admin/Owner check
+        # 🔴 FIX: Admin + Owner can use
         if not await is_admin_or_creator(chat_id, user_id) and not is_owner(user_id):
             await message.reply_text(USER_ERROR_MSG, reply_markup=get_owner_button())
             return
 
-        # 🔴 FIX: Check if reply exists
+        # Reply check
         if not message.reply_to_message:
             await message.reply_text(REPLY_ERROR_MSG)
             return
 
         target = message.reply_to_message.from_user
 
-        # 🔴 FIX: Check if target exists
         if target is None:
             await message.reply_text(f"❌{LINE}❌\n   **__User not found or deleted!__**\n❌{LINE}❌")
             return
@@ -1038,13 +1033,14 @@ async def mute_user(client, message: Message):
         logger.error(f"❌ Mute error: {e}")
         await message.reply_text(f"❌ **__Error:__** {str(e)}")
 
-# ========== 🔴 UNMUTE COMMAND ==========
+# ========== 🔴 UNMUTE COMMAND - FIXED ==========
 @app.on_message(filters.group & filters.command("tbur"))
 async def unmute_user(client, message: Message):
     try:
         chat_id = message.chat.id
         user_id = message.from_user.id
 
+        # Revoked user check
         if is_revoked(chat_id, user_id):
             try:
                 await message.delete()
@@ -1052,10 +1048,12 @@ async def unmute_user(client, message: Message):
                 pass
             return
 
+        # 🔴 FIX: Admin + Owner can use
         if not await is_admin_or_creator(chat_id, user_id) and not is_owner(user_id):
             await message.reply_text(USER_ERROR_MSG, reply_markup=get_owner_button())
             return
 
+        # Reply check
         if not message.reply_to_message:
             await message.reply_text(REPLY_ERROR_MSG)
             return
