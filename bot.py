@@ -17,8 +17,8 @@ logger = logging.getLogger(__name__)
 
 # ========== CONFIGURATION ==========
 # 🔴 APNA DATA DAALO
-API_ID = 12345
-API_HASH = "your_api_hash"
+API_ID = 35140329
+API_HASH = "011f638e4acadee178c59afffc80193d"
 
 # 🔴 DO ALAG BOT TOKENS
 MAIN_BOT_TOKEN = "8603632286:AAHD-EKEJKpWXoOYZTbJOsQd9dCTVLxPEnI"  # Group notification bot
