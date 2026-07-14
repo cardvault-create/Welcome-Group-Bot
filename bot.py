@@ -815,45 +815,13 @@ print("✅ Bot created!")
 def is_owner(user_id):
     return user_id == OWNER_ID
 
-# ========== IS ADMIN OR CREATOR ==========
+# ========== 🔴 SIRF YAHI CHANGE KIYA HAI - ADMIN CHECK ==========
 async def is_admin_or_creator(chat_id, user_id):
     try:
         member = await app.get_chat_member(chat_id, user_id)
         return member.status in ["administrator", "creator"]
     except:
         return False
-
-# ========== CHECK IF USER IN GROUP ==========
-async def is_user_in_group(chat_id, user_id):
-    try:
-        member = await app.get_chat_member(chat_id, user_id)
-        return member is not None
-    except:
-        return False
-
-# ========== GET USER FROM ID OR USERNAME ==========
-async def get_user_from_input(client, input_str, chat_id):
-    try:
-        if input_str.isdigit():
-            user_id = int(input_str)
-            try:
-                user = await client.get_users(user_id)
-                return user
-            except:
-                try:
-                    member = await client.get_chat_member(chat_id, user_id)
-                    return member.user
-                except:
-                    return None
-        else:
-            username = input_str.replace("@", "")
-            try:
-                user = await client.get_users(username)
-                return user
-            except:
-                return None
-    except:
-        return None
 
 # ========== SEND NOTIFICATION ==========
 async def send_notification(chat_id, user_mention, msg_template, extra=None):
@@ -977,7 +945,7 @@ async def service_handler(client, message: Message):
     except Exception as e:
         logger.error(f"❌ Error in service_handler: {e}")
 
-# ========== 🔴 MUTE COMMAND - FIXED ==========
+# ========== 🔴 SIRF YAHI CHANGE KIYA - ADMIN + OWNER CHECK ==========
 @app.on_message(filters.group & filters.command("tmkc"))
 async def mute_user(client, message: Message):
     try:
@@ -992,7 +960,7 @@ async def mute_user(client, message: Message):
                 pass
             return
         
-        # Check if user is ADMIN, CREATOR, or OWNER
+        # 🔴 CHANGE: Admin + Owner can use
         if not await is_admin_or_creator(chat_id, user_id) and not is_owner(user_id):
             await message.reply_text(USER_ERROR_MSG, reply_markup=get_owner_button())
             return
@@ -1003,7 +971,6 @@ async def mute_user(client, message: Message):
         
         target = message.reply_to_message.from_user
         
-        # 🔴 FIX: Check if target exists
         if target is None:
             await message.reply_text(f"❌{LINE}❌\n   **__User not found or deleted!__**\n❌{LINE}❌")
             return
@@ -1092,7 +1059,7 @@ async def mute_user(client, message: Message):
         logger.error(f"❌ Mute error: {e}")
         await message.reply_text(f"❌ **__Error:__** {str(e)}")
 
-# ========== 🔴 UNMUTE COMMAND - FIXED ==========
+# ========== 🔴 SIRF YAHI CHANGE KIYA - ADMIN + OWNER CHECK ==========
 @app.on_message(filters.group & filters.command("tbur"))
 async def unmute_user(client, message: Message):
     try:
@@ -1107,7 +1074,7 @@ async def unmute_user(client, message: Message):
                 pass
             return
         
-        # Check if user is ADMIN, CREATOR, or OWNER
+        # 🔴 CHANGE: Admin + Owner can use
         if not await is_admin_or_creator(chat_id, user_id) and not is_owner(user_id):
             await message.reply_text(USER_ERROR_MSG, reply_markup=get_owner_button())
             return
@@ -1118,7 +1085,6 @@ async def unmute_user(client, message: Message):
         
         target = message.reply_to_message.from_user
         
-        # 🔴 FIX: Check if target exists
         if target is None:
             await message.reply_text(f"❌{LINE}❌\n   **__User not found or deleted!__**\n❌{LINE}❌")
             return
@@ -1256,9 +1222,23 @@ async def unrevoke_user(client, message: Message):
             parts = message.text.split()
             if len(parts) >= 2:
                 input_str = parts[1]
-                target = await get_user_from_input(app, input_str, chat_id)
-                if target:
-                    target_id = target.id
+                try:
+                    if input_str.isdigit():
+                        user_id = int(input_str)
+                        try:
+                            target = await app.get_users(user_id)
+                            target_id = user_id
+                        except:
+                            pass
+                    else:
+                        username = input_str.replace("@", "")
+                        try:
+                            target = await app.get_users(username)
+                            target_id = target.id
+                        except:
+                            pass
+                except:
+                    pass
         
         if target is None or target_id is None:
             await message.reply_text(f"❌{LINE}❌\n   **__Reply to a user or provide ID/Username!__**\n   **__Usage: /unrevokemute 123456789__**\n❌{LINE}❌")
@@ -1654,6 +1634,14 @@ async def stats_cmd(client, message):
 💎 Premium Active 💎
 {LINE_BIG}"""
     await message.reply_text(text)
+
+# ========== ADD is_user_in_group FUNCTION ==========
+async def is_user_in_group(chat_id, user_id):
+    try:
+        member = await app.get_chat_member(chat_id, user_id)
+        return member is not None
+    except:
+        return False
 
 # ========== RUN ==========
 if __name__ == "__main__":
